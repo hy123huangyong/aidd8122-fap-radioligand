@@ -1,0 +1,17 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative' }}>
+  <Box style={{ position: 'absolute', top: 0, left: 0, width: 1280, height: 64, background: '#1E4FA8', flexDirection: 'row', alignItems: 'center', paddingLeft: 44, paddingRight: 44 }}>
+    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>The split, not the algorithm, decides the conclusion</Text>
+    <Text style={{ color: '#C9D9F2', fontSize: 14, marginLeft: 'auto' }}>04 · Results</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 88, left: 60, width: 1160, flexDirection: 'column', alignItems: 'center' }}>
+    <Image src="assets/benchmark.png" style={{ width: 1120, height: 328 }} />
+    <Box style={{ width: 1120, background: '#E8EFF8', padding: '14px 22px', boxSizing: 'border-box', marginTop: 22 }}>
+      <Text style={{ fontSize: 18, color: '#1A2230', lineHeight: 1.4 }}>XGBoost R&sup2;: <span style={{ fontWeight: 'bold', color: '#1E4FA8' }}>0.75</span> (random) &rarr; <span style={{ fontWeight: 'bold', color: '#1E4FA8' }}>0.68</span> (scaffold) &rarr; <span style={{ fontWeight: 'bold', color: '#D9534F' }}>&minus;0.79</span> (time). A model trained on pre-2019 chemistry cannot rank the FAPI series at all &mdash; enrichment EF10 = 0.96, i.e. no better than random picks.</Text>
+    </Box>
+    <Text style={{ fontSize: 15.5, color: '#4A5568', marginTop: 14, lineHeight: 1.4 }}>RF &asymp; XGBoost &gt; SVR &gt; ridge on both interpolation protocols; ridge degrades least under time splitting because it relies on additive physicochemical trends rather than scaffold-specific fingerprints.</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>07 / 15</Text>
+  </Box>
+</Slide>

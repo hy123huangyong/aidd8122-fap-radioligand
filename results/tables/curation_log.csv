@@ -1,0 +1,34 @@
+target,step,n
+FAP,raw records,972.0
+FAP,exact relation only,510.0
+FAP,"nM, positive value",510.0
+FAP,no ChEMBL validity flag,461.0
+FAP,no potential duplicate,444.0
+FAP,biochemical assay,443.0
+FAP,"pActivity in [3,12]",443.0
+FAP,RDKit compatible,440.0
+FAP,MW 150-1500 Da,438.0
+FAP,unique structures,384.0
+FAP,median SD of replicates (n=29),0.666
+PREP,raw records,962.0
+PREP,exact relation only,688.0
+PREP,"nM, positive value",685.0
+PREP,no ChEMBL validity flag,675.0
+PREP,no potential duplicate,625.0
+PREP,biochemical assay,623.0
+PREP,"pActivity in [3,12]",623.0
+PREP,RDKit compatible,623.0
+PREP,MW 150-1500 Da,620.0
+PREP,unique structures,512.0
+PREP,median SD of replicates (n=41),0.533
+DPP4,raw records,6553.0
+DPP4,exact relation only,5606.0
+DPP4,"nM, positive value",5586.0
+DPP4,no ChEMBL validity flag,5387.0
+DPP4,no potential duplicate,4928.0
+DPP4,biochemical assay,4892.0
+DPP4,"pActivity in [3,12]",4892.0
+DPP4,RDKit compatible,4888.0
+DPP4,MW 150-1500 Da,4882.0
+DPP4,unique structures,4338.0
+DPP4,median SD of replicates (n=321),0.371

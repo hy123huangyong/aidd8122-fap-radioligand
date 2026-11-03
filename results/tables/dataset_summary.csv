@@ -1,0 +1,4 @@
+target,records_used,compounds,scaffolds,pAct_mean,pAct_sd,pAct_min,pAct_max,pct_active,median_MW,median_clogp,replicates_pct
+FAP,438,384,162,6.4,1.49,4.0,9.89,33.9,401.4,1.58,7.6
+PREP,620,512,227,6.33,1.5,4.0,9.84,35.7,378.6,2.51,8.0
+DPP4,4882,4338,1597,7.17,1.2,4.0,10.1,59.3,387.4,2.19,7.4

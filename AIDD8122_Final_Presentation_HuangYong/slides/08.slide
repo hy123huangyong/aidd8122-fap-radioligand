@@ -1,0 +1,17 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative' }}>
+  <Box style={{ position: 'absolute', top: 0, left: 0, width: 1280, height: 64, background: '#1E4FA8', flexDirection: 'row', alignItems: 'center', paddingLeft: 44, paddingRight: 44 }}>
+    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>Selectivity is a cliff, not a slope</Text>
+    <Text style={{ color: '#C9D9F2', fontSize: 14, marginLeft: 'auto' }}>04 · Results</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 88, left: 60, width: 1160, flexDirection: 'column', alignItems: 'center' }}>
+    <Image src="assets/transfer_selectivity.png" style={{ width: 1120, height: 328 }} />
+    <Box style={{ width: 1120, background: '#E8EFF8', padding: '14px 22px', boxSizing: 'border-box', marginTop: 22 }}>
+      <Text style={{ fontSize: 18, color: '#1A2230', lineHeight: 1.4 }}>Selectivity AUROC <span style={{ fontWeight: 'bold', color: '#1E4FA8' }}>0.84</span> within known scaffolds &mdash; but <span style={{ fontWeight: 'bold', color: '#D9534F' }}>0.38 (below chance)</span> on new scaffolds, over 20 seeds. Used as a filter, the model would enrich the non-selective series.</Text>
+    </Box>
+    <Text style={{ fontSize: 15.5, color: '#4A5568', marginTop: 14, lineHeight: 1.4 }}>Direct modelling of &Delta;pActivity and subtraction of two single-target models are indistinguishable. DPP4 is the dominant liability: 86% of dual-measured compounds are non-selective (mean &Delta; = &minus;1.75 log).</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>08 / 15</Text>
+  </Box>
+</Slide>

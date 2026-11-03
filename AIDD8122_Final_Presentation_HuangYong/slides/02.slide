@@ -1,0 +1,24 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative' }}>
+  <Box style={{ position: 'absolute', top: 96, left: 110, width: 320, flexDirection: 'column' }}>
+    <Text style={{ fontSize: 40, fontWeight: 'bold', color: '#1A2230' }}>Outline</Text>
+    <Box style={{ width: 56, height: 3, background: '#1E4FA8', marginTop: 18 }} />
+    <Text style={{ fontSize: 16, color: '#8B97A8', marginTop: 22, lineHeight: 1.6 }}>Ten minutes, four results, one message about when to trust the model.</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 96, left: 470, width: 700, flexDirection: 'column', gap: 26 }}>
+    {[
+      { n: '01', t: 'Background', d: 'FAP radiopharmaceuticals and what limits the current ligands' },
+      { n: '02', t: 'Research questions', d: 'Accuracy, transfer, trust, and generative design' },
+      { n: '03', t: 'Methods', d: 'Curation, three split protocols, conformal intervals, graph GA' },
+      { n: '04', t: 'Results', d: 'Benchmark, selectivity, uncertainty, temporal drift, design campaigns' },
+      { n: '05', t: 'Conclusions', d: 'Take-home messages, limitations, what I would do next' },
+    ].map((item) => (
+      <Box key={item.n} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 22 }}>
+        <Text style={{ fontSize: 26, fontWeight: 'bold', color: '#1E4FA8', width: 52 }}>{item.n}</Text>
+        <Box style={{ flexDirection: 'column', width: 620 }}>
+          <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#1A2230' }}>{item.t}</Text>
+          <Text style={{ fontSize: 16, color: '#4A5568', marginTop: 4, lineHeight: 1.4 }}>{item.d}</Text>
+        </Box>
+      </Box>
+    ))}
+  </Box>
+</Slide>

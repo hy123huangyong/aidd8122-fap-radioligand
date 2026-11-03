@@ -1,0 +1,2 @@
+=== boot pid=8560 ts=2026-11-03 17:12:48.559 cwd=E:\AIDD\AIDD8122_Final_Project argv=C:\Users\liche\.workbuddy\binaries\node\versions\22.22.2-6\node_modules\@tencent\slidep\dist\index.js create E:/AIDD/AIDD8122_Final_Project/AIDD8122_Final_Presentation_HuangYong/AIDD8122_Final_Presentation_HuangYong.pptx ===
+[2026-11-03 17:12:48.558] [INFO ] [pid=8560] [server-url] baseUrl=http://localhost:39099 source=portFile(C:\Users\liche\.workbuddy\tencent-docs-engine.port)

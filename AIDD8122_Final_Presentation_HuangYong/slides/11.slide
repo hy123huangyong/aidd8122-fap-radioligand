@@ -1,0 +1,27 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative' }}>
+  <Box style={{ position: 'absolute', top: 0, left: 0, width: 1280, height: 64, background: '#1E4FA8', flexDirection: 'row', alignItems: 'center', paddingLeft: 44, paddingRight: 44 }}>
+    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>Generative design: the objectives shape the chemistry</Text>
+    <Text style={{ color: '#C9D9F2', fontSize: 14, marginLeft: 'auto' }}>04 · Results</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 88, left: 60, width: 1160, flexDirection: 'column', alignItems: 'center' }}>
+    <Image src="assets/generative.png" style={{ width: 1120, height: 334 }} />
+    <Box style={{ flexDirection: 'row', gap: 18, marginTop: 20, width: 1120 }}>
+      {[
+        { t: 'Multi-objective', v: '115 scaffolds · QED 0.61', d: 'median MW 413 Da, SA 2.93 — the most usable chemistry', hl: true },
+        { t: 'Affinity only', v: '83 scaffolds · QED 0.25', d: 'median MW 548 Da — the model is exploited, chemistry degenerates', hl: false },
+        { t: 'Random', v: '80 scaffolds · QED 0.52', d: 'no selection pressure; population fitness drifts down', hl: false },
+      ].map((c) => (
+        <Box key={c.t} style={{ flex: 1, background: c.hl ? '#E8EFF8' : '#FFFFFF', border: '1px solid #D6DCE5', padding: '14px 18px', flexDirection: 'column', boxSizing: 'border-box' }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', color: c.hl ? '#1E4FA8' : '#4A5568' }}>{c.t}</Text>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1A2230', marginTop: 5 }}>{c.v}</Text>
+          <Text style={{ fontSize: 14.5, color: '#4A5568', marginTop: 6, lineHeight: 1.4 }}>{c.d}</Text>
+        </Box>
+      ))}
+    </Box>
+    <Text style={{ fontSize: 15.5, color: '#4A5568', marginTop: 14, lineHeight: 1.4 }}>All campaigns hit the affinity model&rsquo;s ceiling (pFAP 9.6&ndash;9.7) within a few generations; they differ in what they sacrifice. 361 of 384 multi-objective archive molecules are novel; top hits are plausible quinoline-carboxamide analogues.</Text>
+  </Box>
+  <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>11 / 15</Text>
+  </Box>
+</Slide>
