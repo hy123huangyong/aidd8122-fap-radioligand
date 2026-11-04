@@ -146,7 +146,7 @@ def bullet(doc, text, size=11.5):
     return p
 
 
-def table(doc, header, rows, caption=None, widths=None, size=9, align=None):
+def table(doc, header, rows, caption=None, widths=None, size=9, align=None, fixed=False):
     if caption:
         c = doc.add_paragraph()
         c.paragraph_format.space_before = Pt(10)
@@ -192,6 +192,13 @@ def table(doc, header, rows, caption=None, widths=None, size=9, align=None):
             set_run(r, size=size)
 
     if widths:
+        if fixed:
+            t.autofit = False
+            layout = OxmlElement("w:tblLayout")
+            layout.set(qn("w:type"), "fixed")
+            t._tbl.tblPr.append(layout)
+            for i, w in enumerate(widths):
+                t.columns[i].width = Cm(w)
         for row in t.rows:
             for i, w in enumerate(widths):
                 row.cells[i].width = Cm(w)
@@ -294,26 +301,26 @@ def build_body(doc, D):
          "tumour mass and deposit the collagen-rich stroma that limits drug penetration and "
          "correlates with poor prognosis. Fibroblast activation protein (FAP) is a type II "
          "transmembrane serine protease of the S9B prolyl-oligopeptidase family that is displayed on "
-         "the surface of activated fibroblasts and is largely absent from healthy tissues, which "
+         "the surface of activated fibroblasts and is largely absent from healthy tissues [9], which "
          "makes it an unusually clean stromal address. Because its catalytic site accepts small, "
          "drug-like inhibitors, FAP became the first stromal target for which a purely small-molecule "
          "theranostic pair was realised: a quinoline-based inhibitor bearing a prolyl warhead can be "
          "labelled with 68Ga or 18F for imaging and with 90Y or 177Lu for therapy, with only the "
-         "chelator changed.")
+         "chelator changed [1,6].")
     para(doc,
          "The clinical trajectory has been steep. FAPI-04, optimised from a series of quinoline "
-         "inhibitors in 2018, produced high-contrast PET images in a broad panel of tumour entities, "
+         "inhibitors in 2018 [1], produced high-contrast PET images in a broad panel of tumour entities [3,4,10], "
          "and its successors FAPI-46 and FAPI-74 extended the usable activity and improved tumour "
-         "retention. More than a thousand patients have since been imaged, and therapeutic analogues "
+         "retention [5,7]. Several hundred patients have since been imaged, and therapeutic analogues "
          "such as 90Y-FAPI-46, 177Lu-FAP-2286 and the albumin-binding 177Lu-LNC1004 have entered "
-         "early-phase trials. For a nuclear medicine group, this is now a ligand-design problem rather "
+         "early-phase trials [6–8]. For a nuclear medicine group, this is now a ligand-design problem rather "
          "than a target-validation problem.")
     heading(doc, "1.2 What limits the current generation of ligands", 2)
     para(doc,
          "Imaging performance has not translated proportionally into therapeutic benefit. In the "
-         "largest reported radiotherapy series, disease control rates cluster around 30–50% and "
-         "objective responses remain below 15%, with haematological toxicity as the practical "
-         "constraint. Retention in tumour is shorter than for prostate-specific membrane antigen "
+         "published FAPI radioligand-therapy series, disease control is reported in roughly 20–80% of "
+         "patients while objective responses remain uncommon (about 21% in the largest phase II cohort "
+         "to date), with haematological toxicity as the practical constraint [7,8,29]. Retention in tumour is shorter than for prostate-specific membrane antigen "
          "(PSMA) ligands, and uptake in normal fibroblasts of the salivary glands, pancreas and "
          "marrow sets a background that cannot be removed by dosimetry alone. The medicinal-chemistry "
          "levers are well defined — the warhead (nitrile versus boronic acid), linker length and "
@@ -330,9 +337,9 @@ def build_body(doc, D):
     heading(doc, "1.3 Why machine learning, and why the usual evaluation is not enough", 2)
     para(doc,
          "Public bioactivity data for FAP are an order of magnitude smaller than for kinase targets: "
-         "ChEMBL contains a few hundred unique FAP inhibitors, contributed by perhaps thirty papers, "
-         "assayed with at least six different substrates and readouts. Published QSAR models of FAP "
-         "inhibitors typically report random-split coefficients of determination of 0.7–0.8, which "
+         "ChEMBL contains a few hundred unique FAP inhibitors, contributed by sixty-odd publications, "
+         "assayed across 78 distinct assays [11,28]. Published QSAR models of FAP "
+         "inhibitors typically report random-split coefficients of determination of 0.7–0.8 [12,14], which "
          "invites the conclusion that affinity prediction is solved. For a chemist the relevant "
          "question is different: will the model rank a new chemotype correctly, and will its error "
          "bars hold when the literature moves on? Random splitting answers neither question, because "
@@ -367,18 +374,18 @@ def build_body(doc, D):
     para(doc,
          "The modern FAP inhibitor series originates from quinoline-2-carboxamides decorated with a "
          "prolyl nitrile warhead, a linker and a chelating group. Lindner and colleagues optimised "
-         "fifteen candidates and identified FAPI-04 as the first clinical tracer, with improved "
+         "fifteen candidates and identified FAPI-04 as the first clinical tracer [1], with improved "
          "serum stability and a clear preference for FAP over CD26 relative to its predecessor "
          "FAPI-02. Loktev and colleagues independently established that such inhibitors can image "
-         "CAF-rich tumours with high contrast, and Kratochwil and colleagues documented uptake across "
-         "28 tumour entities, which established FAP as a pan-tumour stromal target. FAPI-46 improved "
-         "tumour retention and reduced washout, and FAPI-74 allowed 18F-AlF labelling through a "
-         "one-step aluminium fluoride method, which decouples the tracer from a 68Ga generator.")
+         "CAF-rich tumours with high contrast [2], and Kratochwil and colleagues documented uptake across "
+         "28 tumour entities [3], which established FAP as a pan-tumour stromal target. FAPI-46 improved "
+         "tumour retention and reduced washout [7], and FAPI-74 allowed 18F-AlF labelling through a "
+         "one-step aluminium fluoride method [5], which decouples the tracer from a 68Ga generator.")
     para(doc,
-         "The therapeutic branch followed quickly. 90Y-FAPI-46 was tested in advanced sarcoma, "
+         "The therapeutic branch followed quickly. 90Y-FAPI-46 was tested in advanced sarcoma [7], "
          "177Lu-FAP-2286 became the first DOTA-bearing FAP ligand taken into a first-in-human "
-         "dosimetry study, and 177Lu-LNC1004 introduced an Evans blue albumin-binding motif to extend "
-         "circulation time. Across these series the pattern is consistent: imaging contrast is "
+         "dosimetry study [6], and 177Lu-LNC1004 introduced an Evans blue albumin-binding motif to extend "
+         "circulation time [8]. Across these series the pattern is consistent: imaging contrast is "
          "excellent, objective response rates are low, and the field attributes the gap to short "
          "intratumoural retention and to the stromal, non-malignant nature of the target. Whatever "
          "the biological explanation, the practical consequence for design is that affinity alone is "
@@ -388,16 +395,16 @@ def build_body(doc, D):
     para(doc,
          "On ChEMBL-scale benchmarks, gradient-boosted trees over circular fingerprints remain "
          "competitive with, and frequently superior to, graph neural networks, particularly when the "
-         "number of measurements per target is in the hundreds. Mayr and colleagues showed on 1,300 "
+         "number of measurements per target is in the hundreds [26]. Mayr and colleagues showed on 1,300 "
          "ChEMBL targets that deep architectures only overtake classical methods when data are "
-         "abundant, and van Tilborg and colleagues demonstrated that much of the apparent advantage "
+         "abundant [12], and van Tilborg and colleagues demonstrated that much of the apparent advantage "
          "of learned representations disappears once activity cliffs and scaffold novelty are "
-         "accounted for. For a target like FAP, with fewer than 500 unique compounds, a well-tuned "
+         "accounted for [13]. For a target like FAP, with fewer than 500 unique compounds, a well-tuned "
          "tree ensemble over combined fingerprints and physicochemical descriptors is therefore the "
          "rational baseline, and any deep model must justify itself against it.")
     para(doc,
          "A second line of work uses transfer learning across related targets. Because PREP and DPP4 "
-         "belong to the same protease family and have 1.3-fold and 11-fold more measurements than "
+         "belong to the same protease family and contribute 1.3-fold and 11-fold more compounds than "
          "FAP, their data are an obvious auxiliary source. Reported gains from such transfer are "
          "typically small and highly dependent on whether the auxiliary task shares chemotypes with "
          "the target task; when the auxiliary data are dominated by a different chemical series, "
@@ -406,10 +413,10 @@ def build_body(doc, D):
     para(doc,
          "The gap between random and scaffold splits is one of the best-documented reproducibility "
          "problems in molecular machine learning. MoleculeNet popularised scaffold splitting precisely "
-         "because random splits allow near-analogues of test compounds into training. Wallach and "
+         "because random splits allow near-analogues of test compounds into training [14]. Wallach and "
          "Heifets showed that many ligand-based benchmarks reward memorisation rather than "
-         "generalisation, and Sheridan argued for time-split cross-validation as the closest "
-         "available proxy for prospective prediction. For a target whose literature is dominated by "
+         "generalisation [15], and Sheridan argued for time-split cross-validation as the closest "
+         "available proxy for prospective prediction [16]. For a target whose literature is dominated by "
          "one chemotype introduced at a known date, as is the case for FAP after 2018, the time split "
          "is not a technicality: it is the only protocol that reproduces the situation in which a "
          "medicinal chemist would actually use the model.")
@@ -418,9 +425,9 @@ def build_body(doc, D):
          "Point predictions without an error estimate are of limited use in a synthesis meeting. Two "
          "complementary tools exist. Applicability-domain analysis asks whether a query compound is "
          "represented by the training set, typically through a similarity threshold or a bounding "
-         "box in descriptor space, and has been reviewed extensively for QSAR models. Conformal "
+         "box in descriptor space, and has been reviewed extensively for QSAR models [17]. Conformal "
          "prediction instead constructs a distribution-free interval around each prediction from "
-         "held-out residuals, with a finite-sample coverage guarantee that holds under exchangeability "
+         "held-out residuals, with a finite-sample coverage guarantee [18] that holds under exchangeability "
          "of calibration and test data. The exchangeability assumption is exactly what scaffold and "
          "temporal splits violate, which makes conformal prediction an informative diagnostic rather "
          "than a universal remedy: if coverage collapses, the data are not exchangeable and the "
@@ -429,11 +436,11 @@ def build_body(doc, D):
     para(doc,
          "Generative design for small molecules has converged on two families: graph-based genetic "
          "algorithms operating directly on molecular graphs through fragment crossover and graph "
-         "mutation, and deep generative models trained on large corpora. Jensen's graph GA remains a "
+         "mutation, and deep generative models trained on large corpora [19]. Jensen's graph GA remains a "
          "strong baseline because it requires no training data and optimises arbitrary scoring "
          "functions. When several properties must be balanced — affinity, selectivity, "
          "drug-likeness, synthetic accessibility — multi-objective evolutionary algorithms such as "
-         "NSGA-II are the natural choice, because they return a Pareto front instead of a single "
+         "NSGA-II [20] are the natural choice, because they return a Pareto front instead of a single "
          "scalarised optimum and thereby expose the trade-offs to the chemist. Their weakness in a "
          "drug-discovery setting is that the scoring function is itself a model, so the optimizer "
          "will exploit its errors unless novelty and applicability are enforced explicitly.")
@@ -504,10 +511,11 @@ def build_body(doc, D):
 
     heading(doc, "4.1 Data acquisition", 2)
     para(doc,
-         "Bioactivity records were retrieved programmatically from the ChEMBL REST API (release 35) "
+         "Bioactivity records were retrieved programmatically from the ChEMBL REST API (release 37, May 2026) "
          "for three targets: FAP (CHEMBL4683), PREP (CHEMBL3202) and DPP4 (CHEMBL284). Only records "
          "with an exact activity relation and a standard type of Ki, IC50 or Kd were requested, with "
-         "standard units in nanomolar. For FAP this returned 972 records, for PREP 962 and for DPP4 "
+         "standard units in nanomolar, retaining ChEMBL's own validity annotations [28]. For FAP this "
+         "returned 972 records, for PREP 962 and for DPP4 "
          "6,553. Records were retrieved together with assay type, assay description, document year, "
          "validity flags and the canonical SMILES of the tested molecule.")
 
@@ -518,7 +526,7 @@ def build_body(doc, D):
          "as potential duplicates, came from a non-biochemical assay (cell-based or ADME assays), fell "
          "outside pActivity 3–12, failed RDKit parsing, or lay outside 150–1,500 Da. Multiple "
          "measurements of the same InChIKey were collapsed to their median pActivity, and the number "
-         "of contributing measurements and the standard deviation were retained. Murcko scaffolds were "
+         "of contributing measurements and the standard deviation were retained. Murcko scaffolds [25] were "
          "computed for scaffold grouping and splitting. The FAP table is the modelling target; PREP "
          "and DPP4 serve as auxiliary and off-target references.")
     para(doc,
@@ -530,7 +538,7 @@ def build_body(doc, D):
 
     heading(doc, "4.3 Chemical representation", 2)
     para(doc,
-         "Each molecule is represented by a concatenation of three blocks: 2,048-bit Morgan "
+         "Each molecule is represented by a concatenation of three blocks: 2,048-bit Morgan [26] "
          "fingerprints with radius 2, 167-bit MACCS keys, and 15 physicochemical descriptors "
          "(molecular weight, cLogP, TPSA, hydrogen-bond donors and acceptors, rotatable bonds, ring "
          "and aromatic-ring counts, fraction of sp3 carbons, heavy-atom count, and counts of nitrile, "
@@ -541,8 +549,8 @@ def build_body(doc, D):
     heading(doc, "4.4 Models and hyperparameters", 2)
     para(doc,
          "Five estimators were compared: a mean predictor (the trivial baseline), ridge regression, "
-         "support-vector regression with an RBF kernel, a random forest with 500 trees, and gradient "
-         "boosting (XGBoost) with 700 trees, learning rate 0.03, maximum depth 6, subsample 0.8, "
+         "support-vector regression with an RBF kernel, a random forest [24] with 500 trees, and gradient "
+         "boosting (XGBoost [23]) with 700 trees, learning rate 0.03, maximum depth 6, subsample 0.8, "
          "column subsample 0.4, L2 penalty 1.0 and minimum child weight 3. Hyperparameters were fixed "
          "a priori rather than tuned per split, because tuning on the test protocol would erase the "
          "very difference the benchmark is designed to measure. All models were fitted on the same "
@@ -594,13 +602,13 @@ def build_body(doc, D):
 
     heading(doc, "4.9 Multi-objective generative design", 2)
     para(doc,
-         "Design used a graph genetic algorithm in the style of Jensen: parents are recombined by "
+         "Design used a graph genetic algorithm in the style of Jensen [19]: parents are recombined by "
          "breaking one acyclic bond in each parent and joining the two largest fragments, and "
          "offspring are mutated by atom substitution, bond-order change, atom addition or atom "
-         "deletion, with sanitisation after every operation. Selection is NSGA-II with fast "
+         "deletion, with sanitisation after every operation. Selection is NSGA-II [20] with fast "
          "non-dominated sorting and crowding distance. Four objectives were optimised simultaneously: "
          "predicted FAP affinity (mean of five XGBoost models), predicted selectivity margin "
-         "(pFAP − max(pPREP, pDPP4)), drug-likeness (QED) and synthetic accessibility (−SA/10). Hard "
+         "(pFAP − max(pPREP, pDPP4)), drug-likeness (QED) and synthetic accessibility (−SA/10) [21,22]. Hard "
          "filters removed invalid structures, compounds outside 250–650 Da, and compounds whose "
          "maximum Tanimoto similarity to the FAP training set was below 0.40. The initial population "
          "was drawn from the 130 measured FAP actives with pActivity ≥ 7.")
@@ -613,7 +621,7 @@ def build_body(doc, D):
 
     heading(doc, "4.10 Implementation and reproducibility", 2)
     para(doc,
-         "All code is Python 3.13 with RDKit 2026.09.1, scikit-learn 1.9.1, XGBoost 3.4.1 and "
+         "All code is Python 3.13 with RDKit 2026.09.1 [27], scikit-learn 1.9.1, XGBoost 3.4.1 and "
          "NumPy 2.5.4. The pipeline is organised as numbered scripts (fetch, curate, benchmark, "
          "transfer, analysis, generative, figures, report), each writing a table or figure that the "
          "next stage reads. The curated datasets, the full set of predictions and the code are "
@@ -666,7 +674,7 @@ def build_body(doc, D):
     figure(doc, FIG / "fig1_dataset.png",
            "**Figure 2.** The curated datasets. (a) Potency coverage of the three targets; the dotted "
            "line marks 100 nM. (b) FAP compounds split by publication era, showing the shift towards "
-           "larger, more potent molecules after 2020. (c) Scaffold diversity, which is low for FAP "
+           "larger, more potent molecules from 2019 onwards. (c) Scaffold diversity, which is low for FAP "
            "relative to its compound count.")
 
     heading(doc, "5.2 Accuracy depends more on the split than on the algorithm", 2)
@@ -701,7 +709,7 @@ def build_body(doc, D):
          "scaffolds and is still usable: R² 0.68, Spearman 0.81, screening AUROC 0.94.")
     para(doc,
          "The time split does not degrade the models, it destroys them. XGBoost reaches R² = −0.79 and "
-         "a rank correlation of −0.12; the random forest is worse still (R² = −1.03). The mean "
+         "a rank correlation of −0.11; the random forest is worse still (R² = −1.03). The mean "
          "predictor is as good as any learned model (R² ≈ −1.06). Enrichment falls to 0.96, i.e. no "
          "better than selecting compounds at random. Notably, ridge regression degrades far less "
          "(R² = −0.07), which is the signature of a model that relies on additive physicochemical "
@@ -845,7 +853,7 @@ def build_body(doc, D):
     para(doc,
          "Error rises monotonically as the query moves away from the training set: RMSE is 0.70 for "
          "compounds with a nearest-neighbour similarity above 0.7 (n = 263), 0.94 in the 0.6–0.7 bin, "
-         "0.96 in the 0.5–0.6 bin and about 1.0 below 0.5. The absolute magnitude of the effect is "
+         "0.96 in the 0.5–0.6 bin and 0.95–1.12 below 0.5. The absolute magnitude of the effect is "
          "modest — roughly 0.3 log units between the best and worst bins — but it is monotone and it "
          "is the basis for a usable rule: a prediction supported by a similarity above 0.6 can be "
          "quoted with an error comparable to assay noise, and below 0.5 it cannot.")
@@ -898,7 +906,8 @@ def build_body(doc, D):
           widths=[6.4, 2.0, 2.0, 1.6, 2.0, 2.4])
     para(doc,
          f"The raw time-split model has RMSE {raw.RMSE:.2f} and R² {raw.R2:.2f}, with a mean signed "
-         f"error of {rec.mean_offset:+.2f} log units: it systematically under-predicts the potency of "
+         f"error of {rec.mean_offset:+.2f} log units (a single fit at seed 0; the five-seed mean in §5.2 is "
+         f"−0.79 with RMSE 2.05): it systematically under-predicts the potency of "
          "post-2018 compounds by more than an order of magnitude. Recalibrating a single intercept on "
          f"a quarter of the test set reduces RMSE to {rec.RMSE:.2f} and brings R² to {rec.R2:.2f}, but "
          f"the rank correlation is unchanged at {rec.Spearman:.2f}. This decomposition is the cleanest "
@@ -944,7 +953,7 @@ def build_body(doc, D):
          "distinguish a genuine 10 nM inhibitor from an implausible one, and the optimizer finds the "
          "model's most confident region within a few generations. The campaigns therefore differ not "
          "in predicted affinity but in what they sacrifice to get there. Without selection pressure "
-         "the breeding population drifts downwards and loses half of its median fitness within 24 "
+         "the breeding population drifts downwards from pFAP 7.35 to 6.44 within 24 "
          "generations (Figure 7a); under affinity-only selection it climbs steadily while its "
          "chemistry degenerates — the median QED of the archived molecules collapses to 0.25 and the "
          "median molecular weight inflates to 548 Da, because polar atoms are traded for hydrophobic "
@@ -968,7 +977,7 @@ def build_body(doc, D):
             f"{r.mw:.0f}"] for r in top.itertuples()],
           caption="**Table 10.** Six highest-ranked novel molecules from the multi-objective "
                   "campaign, ranked by predicted pFAP and selectivity margin.",
-          widths=[8.6, 1.4, 1.6, 1.4, 1.4, 1.6], size=8.5)
+          widths=[8.3, 1.4, 1.8, 1.2, 1.0, 1.7], size=8.5, fixed=True)
     fig_gen = FIG / "fig7_generative.png"
     figure(doc, fig_gen,
            "**Figure 7.** Generative design. (a) Median predicted affinity of the breeding "
@@ -1070,8 +1079,9 @@ def build_body(doc, D):
         "Fendler WP, Pabst KM, Kessler L, Fragoso Costa P, Ferdinandus J, Weber M, et al. Safety and "
         "efficacy of 90Y-FAPI-46 radioligand therapy in patients with advanced sarcoma and other "
         "cancer entities. Clin Cancer Res. 2022;28(19):4346–4353.",
-        "Fu H, Huang J, Sun L, Wu H, Chen H, Zhang J, et al. 177Lu-LNC1004: a novel albumin-binder "
-        "FAP-targeting radioligand for advanced solid tumours. Clin Cancer Res. 2023;29(23):4740–4750.",
+        "Fu H, Huang J, Zhao L, Chen Y, Xu W, Cai J, et al. 177Lu-LNC1004 radioligand therapy in "
+        "patients with end-stage metastatic cancers: a single-centre, single-arm, phase II study. "
+        "Clin Cancer Res. 2025;31(8):1415–1426.",
         "Fitzgerald AA, Weiner LM. The role of fibroblast activation protein in health and "
         "malignancy. Cancer Metastasis Rev. 2020;39(3):783–803.",
         "Altmann A, Haberkorn U, Siveke J. The latest developments in imaging of fibroblast "
@@ -1113,9 +1123,9 @@ def build_body(doc, D):
         "Landrum G. RDKit: open-source cheminformatics software. https://www.rdkit.org (accessed "
         "November 2026).",
         "Papadatos G, Gaulton A, Hersey A, Overington JP. Activity, assay and target data curation "
-        "and quality in the ChEMBL database. J Cheminform. 2015;7:39.",
-        "Kratochwil C, Haberkorn U, Giesel FL. FAPI PET/CT: a new dimension in molecular imaging. "
-        "J Nucl Med. 2021;62(2):157–159.",
+        "and quality in the ChEMBL database. J Comput Aided Mol Des. 2015;29(9):885–896.",
+        "Ruzzeh S, Abdlkadir AS, Paez D, Kang KW, Watabe T, Moghrabi S, et al. Therapeutic potential "
+        "of FAPI RLT in oncology: a systematic review. Theranostics. 2025;15(9):4084–4100.",
     ]
     for i, ref in enumerate(refs, 1):
         p = doc.add_paragraph()
@@ -1138,7 +1148,7 @@ def build_body(doc, D):
          "The repository is organised as src/01_fetch_chembl.py through src/09_build_report.py, with "
          "data/raw holding the retrieved ChEMBL records and results/tables holding every number "
          "reported in this document. Running the scripts in numerical order reproduces all figures "
-         "and tables from the public API; a conda environment file and a short README are included.")
+         "and tables from the public API; a pinned requirements file and a short README are included.")
 
 
 def main() -> None:
@@ -1214,6 +1224,49 @@ def main() -> None:
 
     build_body(doc, D)
     OUT.parent.mkdir(parents=True, exist_ok=True)
+    # drop empty paragraphs left between the cover table and the TOC heading
+    _body = doc.element.body
+    _kids = list(_body)
+    _toc_i = None
+    for _i, _ch in enumerate(_kids):
+        if _ch.tag.endswith("}p"):
+            _txt = "".join(t.text or "" for t in _ch.iter(qn("w:t")))
+            if "Table of Contents" in _txt:
+                _toc_i = _i
+                break
+    if _toc_i is not None:
+        _tbl_i = max((_i for _i, _ch in enumerate(_kids[:_toc_i]) if _ch.tag.endswith("}tbl")),
+                     default=None)
+        if _tbl_i is not None:
+            for _ch in _kids[_tbl_i + 1:_toc_i]:
+                if _ch.tag.endswith("}p") and not "".join(
+                        t.text or "" for t in _ch.iter(qn("w:t"))).strip():
+                    _body.remove(_ch)
+
+    # use a true minus sign for negative numbers in body text and tables
+    import re as _re
+    _pat = _re.compile(r"(?<![\d\w])-(?=\d)")
+
+    def _fix(text: str) -> str:
+        if not text:
+            return text
+        out = _pat.sub("\u2212", text)
+        if out.startswith("-") and len(out) > 1 and out[1].isdigit():
+            out = "\u2212" + out[1:]
+        return out
+
+    for _p in doc.paragraphs:
+        for _r in _p.runs:
+            if "-" in _r.text:
+                _r.text = _fix(_r.text)
+    for _t in doc.tables:
+        for _row in _t.rows:
+            for _cell in _row.cells:
+                for _p in _cell.paragraphs:
+                    for _r in _p.runs:
+                        if "-" in _r.text:
+                            _r.text = _fix(_r.text)
+
     doc.save(str(OUT))
     print("saved", OUT)
 

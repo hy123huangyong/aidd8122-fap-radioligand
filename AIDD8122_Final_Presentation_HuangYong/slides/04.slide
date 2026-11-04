@@ -4,7 +4,7 @@
     <Text style={{ color: '#C9D9F2', fontSize: 14, marginLeft: 'auto' }}>02 · Research questions</Text>
   </Box>
   <Box style={{ position: 'absolute', top: 88, left: 60, width: 1160, background: '#E8EFF8', padding: '13px 20px', boxSizing: 'border-box' }}>
-    <Text style={{ fontSize: 17.5, color: '#1A2230', lineHeight: 1.4 }}>Published FAP QSAR models report <span style={{ fontWeight: 'bold' }}>random-split R&sup2; &asymp; 0.75</span>. That answers an interpolation question &mdash; the four questions below are what a design decision actually depends on.</Text>
+    <Text style={{ fontSize: 17.5, color: '#1A2230', lineHeight: 1.4 }}>Published FAP QSAR models report <span style={{ fontWeight: 'bold' }}>random-split R² ≈ 0.75</span>. That answers an interpolation question — the four questions below are what a design decision actually depends on.</Text>
   </Box>
   {[
     { x: 60, y: 208, n: 'RQ1', q: 'How accurate is a FAP affinity model under real use?', d: 'Random vs scaffold vs time split: interpolation, scaffold hopping, prospective prediction.' },
@@ -20,10 +20,10 @@
   ))}
   <Box style={{ position: 'absolute', top: 566, left: 60, width: 1160, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
     <Box style={{ width: 4, height: 40, background: '#1E4FA8' }} />
-    <Text style={{ fontSize: 17, color: '#1A2230', lineHeight: 1.4, width: 1130 }}>Success criteria fixed in advance: scaffold-split R&sup2; &gt; 0.5 with screening AUROC &gt; 0.85, and conformal coverage that can be predicted from the applicability domain.</Text>
+    <Text style={{ fontSize: 17, color: '#1A2230', lineHeight: 1.4, width: 1130 }}>Success criteria fixed in advance: scaffold-split R² above 0.5 and screening AUROC above 0.85, and conformal coverage that can be predicted from the applicability domain.</Text>
   </Box>
   <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
-    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project — Trust Before Throughput</Text>
     <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>04 / 15</Text>
   </Box>
 </Slide>

@@ -2,7 +2,7 @@
   <Box style={{ position: 'absolute', top: 96, left: 110, width: 320, flexDirection: 'column' }}>
     <Text style={{ fontSize: 40, fontWeight: 'bold', color: '#1A2230' }}>Outline</Text>
     <Box style={{ width: 56, height: 3, background: '#1E4FA8', marginTop: 18 }} />
-    <Text style={{ fontSize: 16, color: '#8B97A8', marginTop: 22, lineHeight: 1.6 }}>Ten minutes, four results, one message about when to trust the model.</Text>
+    <Text style={{ fontSize: 16, color: '#8B97A8', marginTop: 22, lineHeight: 1.6 }}>Ten to fifteen minutes, four results, one message about when to trust the model.</Text>
   </Box>
   <Box style={{ position: 'absolute', top: 96, left: 470, width: 700, flexDirection: 'column', gap: 26 }}>
     {[

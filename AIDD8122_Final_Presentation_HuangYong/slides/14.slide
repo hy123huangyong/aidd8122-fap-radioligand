@@ -10,7 +10,7 @@
       '[3] Giesel FL, et al. FAPI-74 PET/CT using either 18F-AlF or cold-kit 68Ga labeling. J Nucl Med. 2021;62(2):201-207.',
       '[4] Baum RP, et al. Feasibility, biodistribution, and preliminary dosimetry in peptide-targeted radionuclide therapy of diverse adenocarcinomas using 177Lu-FAP-2286. J Nucl Med. 2022;63(3):415-423.',
       '[5] Fendler WP, et al. Safety and efficacy of 90Y-FAPI-46 radioligand therapy in patients with advanced sarcoma and other cancer entities. Clin Cancer Res. 2022;28(19):4346-4353.',
-      '[6] Zdrazil B, et al. The ChEMBL Database in 2023: a drug discovery platform spanning multiple bioactivity data types and time periods. Nucleic Acids Res. 2024;52(D1):D1180-D1192.',
+      '[6] Fu H, et al. 177Lu-LNC1004 radioligand therapy in patients with end-stage metastatic cancers: a single-centre, phase II study. Clin Cancer Res. 2025;31(8):1415-1426.',
       '[7] Mayr A, et al. Large-scale comparison of machine learning methods for drug target prediction on ChEMBL. Chem Sci. 2018;9(24):5441-5451.',
       '[8] Wallach I, Heifets A. Most ligand-based classification benchmarks reward memorization rather than generalization. J Chem Inf Model. 2018;58(5):916-932.',
       '[9] Sheridan RP. Time-split cross-validation as a method for estimating the goodness of prospective prediction. J Chem Inf Model. 2013;53(4):783-790.',
@@ -22,7 +22,7 @@
     ))}
   </Box>
   <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
-    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project — Trust Before Throughput</Text>
     <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>14 / 15</Text>
   </Box>
 </Slide>

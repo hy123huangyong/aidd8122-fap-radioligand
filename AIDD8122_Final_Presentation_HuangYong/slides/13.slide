@@ -1,42 +1,42 @@
 <Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative' }}>
   <Box style={{ position: 'absolute', top: 0, left: 0, width: 1280, height: 64, background: '#1E4FA8', flexDirection: 'row', alignItems: 'center', paddingLeft: 44, paddingRight: 44 }}>
-    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>Limitations &mdash; and what I would do next</Text>
+    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>Limitations — and what I would do next</Text>
     <Text style={{ color: '#C9D9F2', fontSize: 14, marginLeft: 'auto' }}>05 · Conclusions</Text>
   </Box>
   <Box style={{ position: 'absolute', top: 100, left: 60, width: 556, flexDirection: 'column' }}>
-    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#D9534F' }}>Limitations</Text>
-    <Box style={{ flexDirection: 'column', gap: 15, marginTop: 16 }}>
+    <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#D9534F' }}>Limitations</Text>
+    <Box style={{ flexDirection: 'column', gap: 26, marginTop: 22 }}>
       {[
-        'ChEMBL snapshot: publication bias towards potent compounds; assay conditions inconsistent across ~30 papers.',
-        'Ligand-based only &mdash; no docking or protein-structure information; physicochemical coincidence cannot be excluded.',
-        'The generative scorer is the same model whose failure modes are documented; pFAP &gt; 9 means "inside the confident region", not "10 nM".',
+        'ChEMBL snapshot: publication bias towards potent compounds; assay conditions inconsistent across ~60 papers.',
+        'Ligand-based only — no docking or protein-structure information; physicochemical coincidence cannot be excluded.',
+        'The generative scorer is the same model whose failure modes are documented; pFAP > 9 means "inside the confident region", not "10 nM".',
         'Similarity gate at 0.40 constrains novelty by construction.',
       ].map((t, i) => (
         <Box key={i} style={{ flexDirection: 'row', gap: 10 }}>
-          <Text style={{ fontSize: 16, color: '#D9534F', fontWeight: 'bold' }}>&bull;</Text>
-          <Text style={{ fontSize: 16, color: '#1A2230', lineHeight: 1.45, width: 520 }}>{t}</Text>
+          <Text style={{ fontSize: 18, color: '#D9534F', fontWeight: 'bold' }}>•</Text>
+          <Text style={{ fontSize: 18, color: '#1A2230', lineHeight: 1.55, width: 516 }}>{t}</Text>
         </Box>
       ))}
     </Box>
   </Box>
   <Box style={{ position: 'absolute', top: 100, left: 664, width: 556, flexDirection: 'column' }}>
-    <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E4FA8' }}>Next steps</Text>
-    <Box style={{ flexDirection: 'column', gap: 15, marginTop: 16 }}>
+    <Text style={{ fontSize: 21, fontWeight: 'bold', color: '#1E4FA8' }}>Next steps</Text>
+    <Box style={{ flexDirection: 'column', gap: 26, marginTop: 22 }}>
       {[
-        'Centralised, consistent assay campaign for a few hundred FAP inhibitors &mdash; the cheapest way to lower the error floor.',
+        'Centralised, consistent assay campaign for a few hundred FAP inhibitors — the cheapest way to lower the error floor.',
         'Structure-aware features (docking poses, protein contacts) to separate sub-pocket match from coincidence.',
         'Prospective time-split validation: freeze the model, score everything published in the next 12 months.',
         'Dual-objective active learning: let the selectivity assay, not the model, decide which generated scaffold is synthesised.',
       ].map((t, i) => (
         <Box key={i} style={{ flexDirection: 'row', gap: 10 }}>
-          <Text style={{ fontSize: 16, color: '#1E4FA8', fontWeight: 'bold' }}>&bull;</Text>
-          <Text style={{ fontSize: 16, color: '#1A2230', lineHeight: 1.45, width: 520 }}>{t}</Text>
+          <Text style={{ fontSize: 18, color: '#1E4FA8', fontWeight: 'bold' }}>•</Text>
+          <Text style={{ fontSize: 18, color: '#1A2230', lineHeight: 1.55, width: 516 }}>{t}</Text>
         </Box>
       ))}
     </Box>
   </Box>
   <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
-    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project — Trust Before Throughput</Text>
     <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>13 / 15</Text>
   </Box>
 </Slide>

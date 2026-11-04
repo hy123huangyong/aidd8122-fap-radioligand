@@ -23,6 +23,7 @@ src/
   07_figures.py          benchmark and selectivity figures
   08_workflow.py         workflow schematic
   09_build_report.py     assembles the .docx report from the template
+  10_add_notes.py        writes the timed speaker notes into the presentation deck
   aidd_utils.py          featurisation, splits, metrics, plotting style
 data/raw/                ChEMBL records as retrieved (JSON)
 data/processed/          curated per-target tables (CSV)
@@ -60,5 +61,5 @@ python src/09_build_report.py
 
 ## Data sources
 
-- ChEMBL REST API (release 35): FAP (CHEMBL4683), PREP (CHEMBL3202), DPP4 (CHEMBL284).
+- ChEMBL REST API (ChEMBL_37, released May 2026): FAP (CHEMBL4683), PREP (CHEMBL3202), DPP4 (CHEMBL284).
 - All records were retrieved on 2026-11-03; curation criteria are documented in the report (§4.2).

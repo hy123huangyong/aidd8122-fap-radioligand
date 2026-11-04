@@ -2,8 +2,8 @@
   <Box style={{ position: 'absolute', top: 235, left: 110, width: 1060, flexDirection: 'column' }}>
     <Text style={{ fontSize: 52, fontWeight: 'bold', color: '#FFFFFF' }}>Thank you</Text>
     <Box style={{ width: 76, height: 3, background: '#FFFFFF', marginTop: 26 }} />
-    <Text style={{ fontSize: 21, color: '#D7E2F5', marginTop: 26, lineHeight: 1.5 }}>Trust before throughput: the useful output of a model on a small, drifting target is a calibrated decision rule &mdash; not a single predicted number.</Text>
+    <Text style={{ fontSize: 21, color: '#D7E2F5', marginTop: 26, lineHeight: 1.5 }}>Trust before throughput: the useful output of a model on a small, drifting target is a calibrated decision rule — not a single predicted number.</Text>
     <Text style={{ fontSize: 16, color: '#AFC6EA', marginTop: 34 }}>Huang Yong · P2600222 · AIDD8122 Final Project · 24 November 2026</Text>
-    <Text style={{ fontSize: 16, color: '#AFC6EA', marginTop: 8 }}>Code and curated data: github.com/huangyong/fap-aidd-8122</Text>
+    <Text style={{ fontSize: 16, color: '#AFC6EA', marginTop: 8 }}>Code, curated data and filter logs: available in the submitted project repository</Text>
   </Box>
 </Slide>

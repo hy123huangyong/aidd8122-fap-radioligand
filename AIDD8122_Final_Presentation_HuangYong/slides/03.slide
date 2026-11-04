@@ -1,31 +1,31 @@
 <Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative' }}>
   <Box style={{ position: 'absolute', top: 0, left: 0, width: 1280, height: 64, background: '#1E4FA8', flexDirection: 'row', alignItems: 'center', paddingLeft: 44, paddingRight: 44 }}>
-    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>FAP is nuclear medicine&rsquo;s fastest-moving small-molecule target</Text>
+    <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: 'bold' }}>FAP is the fastest-moving small-molecule target in nuclear medicine</Text>
     <Text style={{ color: '#C9D9F2', fontSize: 14, marginLeft: 'auto' }}>01 · Background</Text>
   </Box>
   <Box style={{ position: 'absolute', top: 96, left: 60, width: 700, height: 556, flexDirection: 'column', gap: 18 }}>
     <Box style={{ flexDirection: 'column' }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E4FA8' }}>A stromal address with a clean selectivity profile</Text>
-      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Fibroblast activation protein (FAP) sits on cancer-associated fibroblasts, is absent from healthy tissue, and accepts small drug-like inhibitors &mdash; the first stromal target with a small-molecule theranostic pair.</Text>
+      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Fibroblast activation protein (FAP) sits on cancer-associated fibroblasts, is largely absent from healthy tissue, and accepts small drug-like inhibitors — the first stromal target with a small-molecule theranostic pair.</Text>
     </Box>
     <Box style={{ flexDirection: 'column' }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E4FA8' }}>One warhead, four radionuclides</Text>
-      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Quinoline-carboxamide FAPIs (FAPI-04, -46, -74) are labelled with 68Ga / 18F-AlF for imaging and 90Y / 177Lu for therapy &mdash; only the chelator changes.</Text>
+      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Quinoline-carboxamide FAPIs (FAPI-04, -46, -74) are labelled with 68Ga / 18F-AlF for imaging and 90Y / 177Lu for therapy — only the chelator changes.</Text>
     </Box>
     <Box style={{ flexDirection: 'column' }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#D9534F' }}>Imaging contrast has not become therapeutic benefit</Text>
-      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Retention in tumour is short and response rates are modest, so the field needs better ligands &mdash; and each design cycle costs weeks of chemistry plus an animal study.</Text>
+      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Retention in tumour is short and response rates are modest, so the field needs better ligands — and each design cycle costs weeks of chemistry plus an animal study.</Text>
     </Box>
     <Box style={{ flexDirection: 'column' }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#1E4FA8' }}>The design levers</Text>
-      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Warhead (nitrile vs boronate) · linker · chelator · albumin binder &mdash; with selectivity over PREP and DPP4 as the hard constraint.</Text>
+      <Text style={{ fontSize: 18, color: '#1A2230', marginTop: 8, lineHeight: 1.5 }}>Warhead (nitrile vs boronate) · linker · chelator · albumin binder — with selectivity over PREP and DPP4 as the hard constraint.</Text>
     </Box>
   </Box>
   <Box style={{ position: 'absolute', top: 96, left: 800, width: 420, height: 556, flexDirection: 'column', gap: 20 }}>
     {[
       { v: '28', u: 'tumour entities imaged', s: '68Ga-FAPI PET/CT, Kratochwil 2019' },
-      { v: '>1,000', u: 'patients imaged since 2018', s: 'FAPI-04 / -46 / -74 series' },
-      { v: '<15%', u: 'objective response in therapy', s: '177Lu-FAP-2286 · 90Y-FAPI-46 · LNC1004' },
+      { v: '4', u: 'radionuclides, one warhead', s: '68Ga / 18F-AlF imaging · 90Y / 177Lu therapy' },
+      { v: '~21%', u: 'best objective response in therapy', s: 'phase II 177Lu-LNC1004, Fu 2025' },
     ].map((k) => (
       <Box key={k.v} style={{ background: '#E8EFF8', padding: '22px 26px', flexDirection: 'column' }}>
         <Text style={{ fontSize: 54, fontWeight: 'bold', color: '#1E4FA8', lineHeight: 1.1 }}>{k.v}</Text>
@@ -35,7 +35,7 @@
     ))}
   </Box>
   <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
-    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project — Trust Before Throughput</Text>
     <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>03 / 15</Text>
   </Box>
 </Slide>

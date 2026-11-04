@@ -5,7 +5,7 @@
   </Box>
   <Box style={{ position: 'absolute', top: 96, left: 60, width: 1160, flexDirection: 'column', gap: 26 }}>
     {[
-      { n: '1', t: 'The evaluation protocol outweighs the algorithm', d: 'The same XGBoost model is excellent (R&sup2; 0.75) or worse than the mean predictor (R&sup2; &minus;0.79) depending only on the split. A claim about FAP prediction that does not specify the split is unfalsifiable.' },
+      { n: '1', t: 'The evaluation protocol outweighs the algorithm', d: 'The same XGBoost model is excellent (R² 0.75) or worse than the mean predictor (R² −0.79) depending only on the split. A claim about FAP prediction that does not specify the split is unfalsifiable.' },
       { n: '2', t: 'Assay noise sets the ceiling, not model architecture', d: 'Median replicate SD 0.67 log units vs best RMSE 0.70. The highest-value intervention is a consistent assay campaign, not a bigger network.' },
       { n: '3', t: 'Selectivity must be verified, not optimised in silico', d: 'AUROC 0.84 inside known scaffolds, 0.38 across scaffolds. Conformal intervals are honest only inside the applicability domain (0.79 vs 0.54 coverage at 80%).' },
       { n: '4', t: 'The deliverable is a calibrated decision rule', d: 'Use the model above similarity 0.6, distrust it across series and eras; multi-objective design keeps the chemistry usable while single-objective greed destroys it.' },
@@ -22,7 +22,7 @@
     ))}
   </Box>
   <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
-    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project &mdash; Trust Before Throughput</Text>
+    <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project — Trust Before Throughput</Text>
     <Text style={{ fontSize: 12, color: '#8B97A8', marginLeft: 'auto' }}>12 / 15</Text>
   </Box>
 </Slide>

@@ -51,8 +51,8 @@ def fig_dataset(fap: pd.DataFrame, prep: pd.DataFrame, dpp4: pd.DataFrame) -> No
 
     ax = axes[1]
     fap = fap.copy()
-    fap["era"] = np.where(fap.year_max >= 2021, "2021-2024", "2004-2020")
-    for era, c, m in (("2004-2020", U.PALETTE["grey"], "o"), ("2021-2024", U.PALETTE["accent"], "^")):
+    fap["era"] = np.where(fap.year_max >= 2019, "2019-2024", "2004-2018")
+    for era, c, m in (("2004-2018", U.PALETTE["grey"], "o"), ("2019-2024", U.PALETTE["accent"], "^")):
         d = fap[fap.era == era]
         ax.scatter(d.MW, d.pchembl, s=14, alpha=0.75, c=c, marker=m, label=f"{era} (n={len(d)})",
                    linewidths=0)
@@ -261,7 +261,7 @@ def generative() -> None:
     ax.set_ylim(-2.4, 4.4)
     ax.set_xlabel("predicted pFAP")
     ax.set_ylabel("predicted margin (pFAP $-$ max paralogue)")
-    ax.legend(loc="lower left", fontsize=7)
+    ax.legend(loc="lower right", fontsize=6.8, framealpha=0.9, handletextpad=0.4)
     ax.set_title("b  Archived molecules", loc="left")
 
     # c  drug-likeness pays for single-objective greed

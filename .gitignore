@@ -1,3 +1,26 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# slide-building scratch state and intermediates
+.slidep/
+**/.slidep/
+**/_archive/
+**/_check/
+AIDD8122_Final_Presentation_HuangYong/rebuild.pptx
+AIDD8122_Final_Presentation_HuangYong/build_*.pptx
+AIDD8122_Final_Presentation_HuangYong/*_final.pptx
+AIDD8122_Final_Presentation_HuangYong/deck_*.pptx
+AIDD8122_Final_Presentation_HuangYong/deck_*.pdf
+AIDD8122_Final_Presentation_HuangYong/out_*.pptx
+AIDD8122_Final_Presentation_HuangYong/out_*.pdf
+**/.cache/
+
+# derived submission package (regenerate with src/pack_submission.py)
+Submission_HuangYong_P2600222/
+
+# OS noise
+.DS_Store
+Thumbs.db
+AIDD8122_Final_Presentation_HuangYong/AIDD8122_Final_Presentation_HuangYong.pptx
+report/_chk_*.png
