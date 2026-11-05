@@ -28,9 +28,11 @@ src/
   12_design_feasibility.py  BRICS retrosynthetic triage + radiolabelling audit (Appendix B)
   13_robustness.py       paired bootstrap, stratified re-analysis, Mondrian conformal (Appendix C)
   14_sync_scaffold_summary.py  unifies the scaffold-count convention across tables and figures
-  15_patch_report.py     applies the content corrections to 09_build_report.py (idempotent)
+  15_patch_report.py     consistency pass over the report text (idempotent)
   16_evidence_bundle.py  writes logs/ (environment fingerprint, manifest, reconciliation log)
   17_restore_images.py   restores full-resolution figures after Word saves the .docx
+  fix_slides_text.py     applies the final text corrections to the 15-minute deck
+  fix_notes_placeholder.py  rebuilds the speaker notes as proper notes placeholders
   pack_submission.py     assembles Submission_HuangYong_P2600222/ and its .zip
   aidd_utils.py          featurisation, splits, metrics, plotting style
 data/raw/                ChEMBL records as retrieved (JSON)
@@ -57,7 +59,8 @@ python src/11_reference_dois.py && python src/12_design_feasibility.py && python
 
 The PDF is then produced by `src/build_report_pdf.ps1`, which inserts the Word
 table-of-contents field, exports the PDF and restores the full-resolution figures
-that Word downsamples on save. `src/14`–`src/17` and `pack_submission.py` are
+that Word downsamples on save. `src/14`–`src/17`, the two `fix_*` deck
+utilities and `pack_submission.py` are
 build/report utilities rather than analysis steps; they are documented in
 `docs/00_START_HERE.md`.
 
@@ -75,7 +78,7 @@ build/report utilities rather than analysis steps; they are documented in
 | Multi-objective design campaign | 361 novel molecules, 115 scaffolds, median QED 0.61 |
 | Paired bootstrap of the cliff | Δ AUROC 0.463 [0.392, 0.532] over 20 seeds |
 | Mondrian calibration, out of domain | coverage 0.54 → 0.74 at 80%, width 2.40 → 5.01 at 90% |
-| Radiochemical feasibility of the six designs | 0/6 carry a chelator; 498.6 → 856.9 Da after DOTA |
+| Radiochemical feasibility of the six designs | 0/6 carry a chelator; 498.6 → 885.0 Da after DOTA |
 
 ## Data sources
 

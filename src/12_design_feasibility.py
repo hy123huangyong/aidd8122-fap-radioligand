@@ -41,8 +41,9 @@ PATTERNS = {
     "macrocyclic_chelator": Chem.MolFromSmarts("N1CCNCCNCCNCC1"),
 }
 
-# DOTA free acid, used only for a stoichiometric "what if" estimate.
-DOTA = Chem.MolFromSmiles("OC(=O)CN1CCN(CC(=O)O)CCN(CC(=O)O)CCN1CC(=O)O")
+# DOTA free acid (1,4,7,10-tetraazacyclododecane tetraacetic acid, C16H28N4O8),
+# used only for a stoichiometric "what if" estimate.
+DOTA = Chem.MolFromSmiles("O=C(O)CN1CCN(CC(=O)O)CCN(CC(=O)O)CCN(CC(=O)O)CC1")
 DOTA_MW = Descriptors.MolWt(DOTA)
 DOTA_TPSA = rdMolDescriptors.CalcTPSA(DOTA)
 # mono-amide formation loses one H2O from the acid + one H from the amine

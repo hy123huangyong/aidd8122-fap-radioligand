@@ -87,7 +87,7 @@ the exact files used, retrieved 3 November 2026.
 | Mondrian (conditional) calibration, out of domain | 0.54 → 0.74 at 80%, width 2.40 → 5.01 at 90% | `mondrian_conformal.csv` |
 | Systematic offset of post-2018 literature | +1.18 log units | `temporal.csv` |
 | Multi-objective campaign | 361 novel, 115 scaffolds, median QED 0.61 | `generative_summary.json` |
-| Design feasibility triage | 0/6 carry a chelator; DOTA conjugation 498.6 → 856.9 Da | `radiolabel_feasibility.csv`, `retrosynthesis.csv` |
+| Design feasibility triage | 0/6 carry a chelator; DOTA conjugation 498.6 → 885.0 Da | `radiolabel_feasibility.csv`, `retrosynthesis.csv` |
 
 ## Data provenance
 

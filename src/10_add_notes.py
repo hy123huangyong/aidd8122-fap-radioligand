@@ -35,8 +35,9 @@ Drive the three cards, then the lever list.
   reason the field moved so fast.
 - One warhead, four radionuclides: 68Ga / 18F-AlF for imaging, 90Y / 177Lu for
   therapy. Only the chelator changes, so a single chemistry serves both.
-- ~21% objective response in the largest phase II cohort (177Lu-LNC1004,
-  Fu 2025). Contrast has not become benefit.
+- Objective response 14% (4 of 28), disease control 46%, in the largest phase
+  II cohort (177Lu-LNC1004, Fu 2025) -- and grade 3/4 haematological toxicity
+  in 21% of that cohort. Contrast has not become benefit.
 
 Then the four levers: warhead (nitrile vs boronate), linker, chelator, albumin
 binder -- with selectivity over PREP and DPP4 as the hard constraint.
@@ -62,7 +63,7 @@ Walk left to right, do not linger on any box.
 - 972 raw FAP records from ChEMBL_37 (target CHEMBL4683); every record keeps
   its assay ID so the audit trail survives all the way to the figure.
 - Curation chain: 972 raw -> 510 exact-relation -> 438 in range -> 384 unique
-  structures, 162 Murcko scaffolds. The filter log is a deliverable, not
+  structures, 161 Murcko scaffolds. The filter log is a deliverable, not
   housekeeping.
 - Descriptors: Morgan-2048/r2, MACCS-167, 15 physicochemical.
 - Three splits (random / scaffold / time), four model families, conformal
@@ -75,8 +76,8 @@ the whole methodological bet of this project." """,
 """TIME 4:15-5:45 | 90 s
 
 Three numbers, in this order:
-- 972 -> 384 unique inhibitors, 162 scaffolds. For scale: DPP4 in the same
-  release has 4,338 compounds and 1,597 scaffolds. FAP is roughly one-eleventh
+- 972 -> 384 unique inhibitors, 161 scaffolds. For scale: DPP4 in the same
+  release has 4,338 compounds and 1,596 scaffolds. FAP is roughly one-eleventh
   the size.
 - 0.67 log median replicate SD. That is the floor no model can beat -- and our
   best RMSE is 0.70. "We are already at the noise floor. More architecture buys
@@ -116,8 +117,12 @@ are indistinguishable (0.84 vs 0.82 random, 0.38 vs 0.36 scaffold). So the
 problem is the data, not the formulation.
 
 Biology: DPP4 is the dominant liability -- 86% of the 232 dual-measured
-compounds are non-selective, mean delta -1.75 log. Against PREP, 100 pairs,
-mean delta only +0.59.
+compounds are non-selective vs DPP4, mean delta -1.75 log. Against PREP, 100
+pairs, mean delta only +0.59.
+
+If asked whether the AUROC result survives stratification: it holds in the
+IC50-only and replicated strata, and reverses only in the small mixed-assay
+stratum (n = 30) -- reported honestly in the report, section 5.5.
 
 The sentence to say: "Selectivity is a cliff. One atom flips it, and 384
 compounds do not map a cliff." """,
@@ -168,7 +173,11 @@ Three arms, same 384-member archive.
 
 The point: "All three hit the ceiling of the affinity model (pFAP 9.6-9.7) in
 a few generations. They differ only in what they sacrifice. The objective
-function is the chemistry." """,
+function is the chemistry."
+
+One guard sentence: "These are warheads, not radioligands -- none carries a
+chelator or a leaving group, and DOTA conjugation would push them far outside
+the applicability domain (Appendix B of the report)." """,
 
 # 12 take-home (0:45)
 """TIME 12:30-13:15 | 45 s

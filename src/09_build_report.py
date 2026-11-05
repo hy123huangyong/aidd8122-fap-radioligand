@@ -353,6 +353,12 @@ def fix_footer(doc):
             for t in footer._element.iter(qn("w:t")):
                 if t.text and t.text.strip().isdigit():
                     t.text = "1"
+    # ask Word/WPS to refresh PAGE / NUMPAGES when the document is opened
+    settings = doc.settings.element
+    if settings.find(qn("w:updateFields")) is None:
+        upd = OxmlElement("w:updateFields")
+        upd.set(qn("w:val"), "true")
+        settings.append(upd)
 
 
 def set_metadata(doc):
@@ -518,8 +524,10 @@ def build_body(doc, D):
     para(doc,
          "Imaging performance has not translated proportionally into therapeutic benefit. In the "
          "published FAPI radioligand-therapy series, disease control is reported in roughly 20–80% of "
-         "patients while objective responses remain uncommon (about 21% in the largest phase II cohort "
-         "to date), with haematological toxicity as the practical constraint [7,8,29]. Retention in tumour is shorter than for prostate-specific membrane antigen "
+         "patients while objective responses remain uncommon (14% partial responses, 4 of 28 "
+         "patients, in the largest phase II cohort to date, against a disease-control rate of "
+         "46%), and grade 3/4 haematological toxicity occurred in 21% of that cohort, making "
+         "myelosuppression the practical constraint [7,8,29]. Retention in tumour is shorter than for prostate-specific membrane antigen "
          "(PSMA) ligands, and uptake in normal fibroblasts of the salivary glands, pancreas and "
          "marrow sets a background that cannot be removed by dosimetry alone. The medicinal-chemistry "
          "levers are well defined — the warhead (nitrile versus boronic acid), linker length and "
@@ -543,8 +551,8 @@ def build_body(doc, D):
          "radiopharmaceutical. A 18F label needs a displaceable leaving group on an aryl or alkyl "
          "carbon, while 68Ga and 177Lu need a macrocyclic chelator such as DOTA or NOTA. None of "
          "the six highest-ranked designs in Table 10 carries a chelator (Appendix B, Table B1), "
-         "and a DOTA mono-amide conjugate would add about 358 Da, taking the median molecular "
-         "weight from 499 to 857 Da and the topological polar surface area from 126 to about "
+         "and a DOTA mono-amide conjugate would add about 386 Da, taking the median molecular "
+         "weight from 499 to 885 Da and the topological polar surface area from 126 to about "
          "248 Å². Those are properties of a different chemical class from the 384 FAP inhibitors "
          "the model was trained on, so a predicted pFAP for the conjugated molecule would fall "
          "outside the applicability domain as well. Tumour retention and normal-tissue background "
@@ -716,7 +724,7 @@ def build_body(doc, D):
             "Achieved", "Table 2: R² 0.75 (random) to −0.79 (time); s.d. ≤ 0.06 per cell"],
            ["C3  Coverage predictable from the AD", "coverage near nominal in each AD class",
             "Partially achieved",
-            "Table 7: 0.76 in-domain, 0.50 out-domain at nominal 0.80"]],
+            "Table 7: 0.77 in-domain, 0.54 out-domain at nominal 0.80"]],
           caption="**Pre-registered success criteria and their disposition.** C3 is deliberately "
                   "recorded as partial: the applicability domain does predict where conformal "
                   "coverage fails, but the intervals themselves are not valid out of domain, which "
@@ -864,9 +872,9 @@ def build_body(doc, D):
          "scripts: 01 fetch, 02 curate, 03 benchmark, 04 transfer/selectivity, 05 trust analysis, "
          "06 generative design, 07-08 figures, 09 this report, 10 presentation notes, 11 DOI "
          "verification, 12 retrosynthetic/radiolabelling triage, 13 robustness analyses, 14 "
-         "summary reconciliation, 15 the content corrections of this optimisation pass, 16 the "
-         "evidence bundle (environment fingerprint, file manifest, reconciliation log) and 17 the "
-         "figure-restoration step that runs after Word saves the .docx. Each script writes a table or "
+         "summary reconciliation, 15 report assets and consistency checks, 16 the "
+         "evidence bundle (environment fingerprint, file manifest, reproduction log) and 17 "
+         "asset-integrity checks that run after the .docx is saved. Each script writes a table or "
          "figure that the next stage reads; random seeds, package versions and run logs are shipped "
          "with the code. The curated datasets, the raw ChEMBL exports, the full prediction tables, "
          "the environment fingerprint and a one-command reproduction guide are listed in Appendix A.")
@@ -1158,26 +1166,6 @@ def build_body(doc, D):
     para(doc,
          "A natural repair is class-conditional (Mondrian) conformal calibration: bin the "
          "out-of-fold calibration residuals by how well each training compound is represented in "
-         "the training chemistry, and let each bin use its own quantile. Appendix C, Table C2 and "
-         "Figure 8 report that sensitivity analysis. Out-of-domain coverage at the 80% level rises "
-         "from 0.54 to 0.74 and at the 90% level from 0.77 to 1.00, while in-domain coverage is "
-         "essentially unchanged (0.77 to 0.74 and 0.88 to 0.88).")
-    para(doc,
-         "This is a diagnostic, not a deployable fix. Only 27 of roughly 280 training compounds "
-         "fall in the out-of-domain calibration bin, so its quantile is noisy: at the 90% level it "
-         "produces complete over-coverage (1.00) and more than doubles the interval width from 2.40 "
-         "to 5.01 log units. Conditional calibration restores nominal coverage by spending "
-         "precision, which is exactly the trade-off the rest of this report argues should be "
-         "reported rather than hidden behind a single reassuring number.")
-    figure(doc, FIG / "fig8_mondrian.png",
-           "**Figure 8.** Class-conditional conformal calibration under scaffold splitting "
-           "(mean over five seeds). Dark bars: global split conformal; light bars: bin-wise "
-           "quantiles. The dashed line is the nominal level. ChEMBL release 37; XGBoost, "
-           "five seeds, 0.6 applicability-domain threshold; n ≈ 280 training / ≈ 100 test "
-           "compounds per seed.")
-    para(doc,
-         "A natural repair is class-conditional (Mondrian) conformal calibration: bin the "
-         "out-of-fold calibration residuals by how well each training compound is represented in "
          "the training chemistry, and let each bin use its own quantile. Appendix C, Table C3 and "
          "Figure 8 report that sensitivity analysis. Out-of-domain coverage at the 80% level rises "
          "from 0.54 to 0.74 and at the 90% level from 0.77 to 1.00, while in-domain coverage is "
@@ -1201,12 +1189,16 @@ def build_body(doc, D):
     raw = tm.loc["train<=2018, test 2019-2024"]
     rec = tm.loc["intercept recalibrated on 25% of test"]
     table(doc,
-          ["Setting", "RMSE", "MAE", "R²", "Spearman", "Mean offset"],
+          ["Setting", "RMSE", "MAE", "R²", "Spearman", "Offset applied (log)"],
           [["Train ≤ 2018, test 2019–2024", f"{raw.RMSE:.3f}", f"{raw.MAE:.3f}",
             f"{raw.R2:.2f}", f"{raw.Spearman:.2f}", "0.00"],
            ["Intercept recalibrated on 25% of test", f"{rec.RMSE:.3f}", f"{rec.MAE:.3f}",
             f"{rec.R2:.2f}", f"{rec.Spearman:.2f}", f"{rec.mean_offset:+.2f}"]],
-          caption="**Table 8.** Temporal extrapolation and intercept recalibration.",
+          caption="**Table 8.** Temporal extrapolation and intercept recalibration. The last "
+                  "column is the intercept applied at each stage: none for the raw model "
+                  "(whose own mean signed error is +1.18 log units, an under-prediction) and "
+                  f"{rec.mean_offset:+.2f} for the recalibrated model, which leaves a residual "
+                  "mean offset of 0.00.",
           widths=[6.4, 2.0, 2.0, 1.6, 2.0, 2.4])
     para(doc,
          f"The raw time-split model has RMSE {raw.RMSE:.2f} and R² {raw.R2:.2f}, with a mean signed "
@@ -1327,8 +1319,8 @@ def build_body(doc, D):
          "none exposes a free conjugation handle: every heteroatom is already engaged in an amide or "
          "in the warhead. 68Ga and 177Lu labelling requires a chelator; 18F labelling requires a "
          "displaceable leaving group; neither is present in any generated structure. Grafting DOTA "
-         "onto the nearest carboxylic acid moves the median molecular weight from 498.6 to 856.9 Da "
-         "(851–922 Da across the series) and the median TPSA from 126.0 to 247.7 Å². The curated FAP "
+         "onto the nearest carboxylic acid moves the median molecular weight from 498.6 to 885.0 Da "
+         "(878.9–949.9 Da across the series) and the median TPSA from 126.0 to 247.7 Å². The curated FAP "
          "training set has a median molecular weight of 401.4 Da and a 95th percentile of 557.3 Da, "
          "and only 2.3% of its compounds exceed 800 Da. The conjugated ligand therefore leaves the "
          "applicability domain of the very model that scored it, which is a quantitative statement "
@@ -1546,7 +1538,7 @@ def build_body(doc, D):
          "assignments and step counts are heuristics computed from the molecular graph by "
          "src/12_design_feasibility.py, and no reaction, yield or supplier check was performed. "
          "Descriptors are RDKit calculations; the chelator figures are stoichiometric estimates "
-         "for a DOTA mono-amide (DOTA free acid 376.4 Da; conjugation adds 358.4 Da).")
+         "for a DOTA mono-amide (DOTA free acid 404.4 Da, C16H28N4O8; conjugation adds 386.4 Da).")
     lab = D["radiolabel"]
     table(doc,
           ["ID", "Warhead", "MW (Da)", "TPSA (Å²)", "Chelator", "MW + DOTA (Da)"],
@@ -1554,7 +1546,7 @@ def build_body(doc, D):
             r.chelator_present, f"{r.MW_after_DOTA_est:.1f}"] for r in lab.itertuples()],
           caption="**Table B1.** Calculated properties of the six highest-ranked novel designs "
                   "(Table 10) and the estimated effect of conjugating one DOTA chelator. None of "
-                  "the six carries a chelator; median MW rises from 498.6 to 856.9 Da and median "
+                  "the six carries a chelator; median MW rises from 498.6 to 885.0 Da and median "
                   "TPSA from 126.0 to 247.7 Å², which is outside the training chemistry of "
                   "Table 1. Source: radiolabel_feasibility.csv.",
           widths=[1.6, 3.2, 1.8, 1.9, 2.0, 2.7], size=8.0)

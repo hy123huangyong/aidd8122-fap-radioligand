@@ -18,7 +18,7 @@
         </Box>
       ))}
     </Box>
-    <Text style={{ fontSize: 15.5, color: '#4A5568', marginTop: 14, lineHeight: 1.4 }}>All campaigns hit the ceiling of the affinity model (pFAP 9.6–9.7) within a few generations; they differ in what they sacrifice. 361 of 384 multi-objective archive molecules are novel; top hits are plausible quinoline-carboxamide analogues.</Text>
+    <Text style={{ fontSize: 15.5, color: '#4A5568', marginTop: 14, lineHeight: 1.4 }}>All campaigns hit the ceiling of the affinity model (pFAP 9.6–9.7) within a few generations; they differ in what they sacrifice. 361 of 384 multi-objective archive molecules are novel; top hits are plausible quinoline-carboxamide warheads — warheads only, not radioligands (no chelator, no leaving group; Appendix B).</Text>
   </Box>
   <Box style={{ position: 'absolute', top: 672, left: 60, width: 1160, flexDirection: 'row' }}>
     <Text style={{ fontSize: 12, color: '#8B97A8' }}>AIDD8122 Final Project — Trust Before Throughput</Text>

@@ -46,6 +46,15 @@ try {
     if ($rng.Find.Found) { $rng.Text = '' }
 
     $doc.Fields.Update() | Out-Null
+
+    # PAGE / NUMPAGES live in header/footer stories; the main-text
+    # Fields.Update() does not reach them, so update each story explicitly.
+    foreach ($sec in $doc.Sections) {
+        foreach ($i in 1..3) {
+            try { $null = $sec.Footers.Item($i).Range.Fields.Update() } catch {}
+            try { $null = $sec.Headers.Item($i).Range.Fields.Update() } catch {}
+        }
+    }
     $doc.Repaginate()
     Write-Output ("TOC entries: " + $toc.Range.Paragraphs.Count + " ; pages: " + $doc.ComputeStatistics(2))
 
@@ -59,6 +68,13 @@ finally {
 }
 
 # Put the 2414-3075 px source figures back into the .docx
-python (Join-Path $root 'src\17_restore_images.py') $docx
+$py = (Get-Command python.exe -ErrorAction SilentlyContinue |
+       Where-Object { $_.Source -notlike '*WindowsApps*' } |
+       Select-Object -First 1).Source
+if (-not $py) {
+    $py = Join-Path $env:USERPROFILE '.workbuddy\binaries\python\versions\3.13.12\python.exe'
+}
+if (-not (Test-Path $py)) { throw "python interpreter not found for the image-restore step" }
+& $py (Join-Path $root 'src\17_restore_images.py') $docx
 
 Get-Item $pdf | Select-Object Name, Length, LastWriteTime | Format-List
