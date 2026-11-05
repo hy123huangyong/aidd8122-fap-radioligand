@@ -1,10 +1,14 @@
-numpy>=2.0
-pandas>=2.2
-scipy>=1.13
-scikit-learn>=1.5
-xgboost>=3.0
-rdkit>=2025.03
-matplotlib>=3.9
-pyarrow>=17.0
-python-docx>=1.1
-pymupdf>=1.24
+# Pinned environment for AIDD8122 Final Project (Huang Yong, P2600222)
+# Verified on Windows 11 / CPython 3.13.14, 2026-11-05.
+# Exact versions are also recorded in 03_Code/logs/environment.txt.
+numpy==2.5.4
+pandas==3.1.0
+scipy==1.18.1
+scikit-learn==1.9.1
+xgboost==3.4.1
+rdkit==2026.09.1
+matplotlib==3.11.2
+python-docx==1.2.0
+pymupdf==2.1
+pyarrow==26.0.0
+Pillow==13.0.0

@@ -150,7 +150,8 @@ def main() -> None:
         frames[name] = df
         all_logs.extend(log)
         print(
-            f"{name}: {len(df)} compounds, {df.scaffold.nunique()} scaffolds, "
+            f"{name}: {len(df)} compounds, "
+            f"{df.scaffold.replace('', np.nan).nunique()} scaffolds, "
             f"pAct {df.pchembl.min():.2f}-{df.pchembl.max():.2f} (median {df.pchembl.median():.2f})"
         )
 
@@ -163,7 +164,11 @@ def main() -> None:
                 "target": name,
                 "records_used": int(df.n_measure.sum()),
                 "compounds": len(df),
-                "scaffolds": df.scaffold.nunique(),
+                # MurckoScaffoldSmiles returns "" for acyclic compounds; an
+                # empty string is NOT a scaffold.  Exclude it so this count
+                # matches the CSV round-trip (where "" is read back as NaN)
+                # and Figure 2c, which reads data/processed/*.csv.
+                "scaffolds": int(df.scaffold.replace("", np.nan).nunique()),
                 "pAct_mean": round(df.pchembl.mean(), 2),
                 "pAct_sd": round(df.pchembl.std(), 2),
                 "pAct_min": round(df.pchembl.min(), 2),

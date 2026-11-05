@@ -1,57 +1,64 @@
+# Build the final report PDF from the python-docx source.
+#
+# Pipeline (run from the project root):
+#   python src/09_build_report.py      # docx, no TOC field populated
+#   powershell -File src/build_report_pdf.ps1   # TOC + PDF + image restore
+#
+# Two things this script exists to handle:
+#   * the TOC has to be a real Word field, so it can be updated by the reader;
+#   * Word downsamples embedded pictures to ~1364 px on its own save, so the
+#     full-resolution figures are restored afterwards by 17_restore_images.py.
+
 $ErrorActionPreference = 'Stop'
 
-$docx = 'E:\AIDD\AIDD8122_Final_Project\report\AIDD8122_Final_Report_HuangYong.docx'
-$pdf  = 'E:\AIDD\AIDD8122_Final_Project\report\AIDD8122_Final_Report_HuangYong.pdf'
+$root = 'E:\AIDD\AIDD8122_Final_Project'
+$name = 'AIDD8122_Final_Report_HuangYong_P2600222_v2'
+$docx = Join-Path $root "report\$name.docx"
+$pdf  = Join-Path $root "report\$name.pdf"
+
+if (-not (Test-Path $docx)) { throw "missing $docx - run python src/09_build_report.py first" }
 
 $word = New-Object -ComObject Word.Application
 $word.Visible = $false
 $word.DisplayAlerts = 0
 
-$doc = $word.Documents.Open($docx, $false, $false, $false)
+try {
+    $doc = $word.Documents.Open($docx, $false, $false, $false)
 
-# Remove any pre-existing TOC objects (a rebuilt docx has none)
-while ($doc.TablesOfContents.Count -gt 0) {
-    $doc.TablesOfContents.Item(1).Delete()
-}
+    # Remove any pre-existing TOC objects (a rebuilt docx has none)
+    while ($doc.TablesOfContents.Count -gt 0) { $doc.TablesOfContents.Item(1).Delete() }
 
-# Locate the placeholder paragraph carrying the TOC field
-$found = $null
-foreach ($p in $doc.Paragraphs) {
-    if ($p.Range.Text -match 'Update Field|build the table of contents') {
-        $found = $p
-        break
+    # Locate the placeholder paragraph carrying the TOC field
+    $found = $null
+    foreach ($p in $doc.Paragraphs) {
+        if ($p.Range.Text -match 'build the table of contents') { $found = $p; break }
     }
+    if ($null -eq $found) { throw 'TOC placeholder paragraph not found' }
+
+    $start = $found.Range.Start
+    $toc = $doc.TablesOfContents.Add($doc.Range($start, $start), $false, 1, 3,
+                                     $false, "", $true, $true, "", $true, $true, $true)
+    $toc.Update()
+
+    $rng = $doc.Content
+    $rng.Find.ClearFormatting()
+    $null = $rng.Find.Execute('Right-click and choose Update Field to build the table of contents.')
+    if ($rng.Find.Found) { $rng.Text = '' }
+
+    $doc.Fields.Update() | Out-Null
+    $doc.Repaginate()
+    Write-Output ("TOC entries: " + $toc.Range.Paragraphs.Count + " ; pages: " + $doc.ComputeStatistics(2))
+
+    $doc.Save()
+    $doc.ExportAsFixedFormat($pdf, 17, $false, 0, 0, 0, 0, 0, $true, $true, 0, $true, $true, $false)
+    $doc.Close($false)
 }
-if ($null -eq $found) {
-    foreach ($f in $doc.Fields) {
-        if ($f.Code.Text -match 'TOC') {
-            $found = $doc.Paragraphs.Item($doc.Range(0, $f.Result.Start).Paragraphs.Count)
-            break
-        }
-    }
+finally {
+    try { $word.Quit() } catch {}
+    [System.Runtime.InteropServices.Marshal]::ReleaseComObject($word) | Out-Null
 }
-if ($null -eq $found) { throw 'TOC placeholder paragraph not found' }
 
-$start = $found.Range.Start
-$end   = $found.Range.End
-$anchor = $doc.Range($start, $start)
+# Put the 2414-3075 px source figures back into the .docx
+python (Join-Path $root 'src\17_restore_images.py') $docx
 
-$toc = $doc.TablesOfContents.Add($anchor, $false, 1, 2, $false, "", $true, $true, "", $true, $true, $true)
-$toc.Update()
-
-# Drop the original placeholder paragraph if it survived below the TOC
-$doc.Content.Find.ClearFormatting()
-$rng = $doc.Content
-$null = $rng.Find.Execute('Right-click and choose Update Field to build the table of contents.')
-if ($rng.Find.Found) { $rng.Text = '' }
-
-$doc.Fields.Update() | Out-Null
-$doc.Repaginate()
-Write-Output ("TOC entries: " + $toc.Range.Paragraphs.Count + " ; pages: " + $doc.ComputeStatistics(2))
-
-$doc.Save()
-$doc.ExportAsFixedFormat($pdf, 17, $false, 0, 0, 0, 0, 0, $true, $true, 0, $true, $true, $false)
-$doc.Close($false)
-$word.Quit()
-[System.Runtime.InteropServices.Marshal]::ReleaseComObject($word) | Out-Null
 Get-Item $pdf | Select-Object Name, Length, LastWriteTime | Format-List

@@ -62,7 +62,7 @@ def fig_dataset(fap: pd.DataFrame, prep: pd.DataFrame, dpp4: pd.DataFrame) -> No
     ax.set_title("b  Two publication eras", loc="left")
 
     ax = axes[2]
-    counts = [fap.scaffold.nunique(), prep.scaffold.nunique(), dpp4.scaffold.nunique()]
+    counts = [df.scaffold.replace("", np.nan).nunique() for df in (fap, prep, dpp4)]
     ax.bar(["FAP", "PREP", "DPP4"], counts,
            color=[U.PALETTE["FAP"], U.PALETTE["PREP"], U.PALETTE["DPP4"]], width=0.6)
     for i, (c, n) in enumerate(zip(counts, [len(fap), len(prep), len(dpp4)])):

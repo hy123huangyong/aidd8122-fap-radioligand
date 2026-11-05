@@ -24,6 +24,14 @@ src/
   08_workflow.py         workflow schematic
   09_build_report.py     assembles the .docx report from the template
   10_add_notes.py        writes the timed speaker notes into the presentation deck
+  11_reference_dois.py   verifies all 29 references against Crossref and attaches DOIs
+  12_design_feasibility.py  BRICS retrosynthetic triage + radiolabelling audit (Appendix B)
+  13_robustness.py       paired bootstrap, stratified re-analysis, Mondrian conformal (Appendix C)
+  14_sync_scaffold_summary.py  unifies the scaffold-count convention across tables and figures
+  15_patch_report.py     applies the content corrections to 09_build_report.py (idempotent)
+  16_evidence_bundle.py  writes logs/ (environment fingerprint, manifest, reconciliation log)
+  17_restore_images.py   restores full-resolution figures after Word saves the .docx
+  pack_submission.py     assembles Submission_HuangYong_P2600222/ and its .zip
   aidd_utils.py          featurisation, splits, metrics, plotting style
 data/raw/                ChEMBL records as retrieved (JSON)
 data/processed/          curated per-target tables (CSV)
@@ -44,7 +52,14 @@ python src/05_analysis.py
 python src/06_generative.py --generations 24 --pop 96   # ~30 min on CPU
 python src/07_figures.py && python src/08_workflow.py
 python src/09_build_report.py
+python src/11_reference_dois.py && python src/12_design_feasibility.py && python src/13_robustness.py
 ```
+
+The PDF is then produced by `src/build_report_pdf.ps1`, which inserts the Word
+table-of-contents field, exports the PDF and restores the full-resolution figures
+that Word downsamples on save. `src/14`–`src/17` and `pack_submission.py` are
+build/report utilities rather than analysis steps; they are documented in
+`docs/00_START_HERE.md`.
 
 ## Headline results
 
@@ -58,6 +73,9 @@ python src/09_build_report.py
 | Conformal coverage at nominal 80%, in / out of domain | 0.77 / 0.54 |
 | Temporal offset of post-2018 literature | +1.18 log units |
 | Multi-objective design campaign | 361 novel molecules, 115 scaffolds, median QED 0.61 |
+| Paired bootstrap of the cliff | Δ AUROC 0.463 [0.392, 0.532] over 20 seeds |
+| Mondrian calibration, out of domain | coverage 0.54 → 0.74 at 80%, width 2.40 → 5.01 at 90% |
+| Radiochemical feasibility of the six designs | 0/6 carry a chelator; 498.6 → 856.9 Da after DOTA |
 
 ## Data sources
 

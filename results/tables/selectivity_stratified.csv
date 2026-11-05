@@ -1,0 +1,8 @@
+stratum,n,n_folds_random,AUROC_random,n_folds_scaffold,AUROC_scaffold,cliff_delta,note
+all (reference),100,20.0,0.841,20.0,0.378,0.463,AUROC unstable when stratum n < 30; interpret as a consistency check
+assay type: IC50 only,70,20.0,0.714,20.0,0.262,0.451,AUROC unstable when stratum n < 30; interpret as a consistency check
+assay type: mixed / other,30,13.0,0.699,20.0,0.857,-0.158,AUROC unstable when stratum n < 30; interpret as a consistency check
+era: 2004-2018,46,20.0,0.927,20.0,0.739,0.187,AUROC unstable when stratum n < 30; interpret as a consistency check
+era: 2019-2024,54,20.0,0.68,20.0,0.108,0.572,AUROC unstable when stratum n < 30; interpret as a consistency check
+replicated (>1 assay),7,,,,,,too few compounds to fit
+single measurement,93,20.0,0.809,20.0,0.286,0.523,AUROC unstable when stratum n < 30; interpret as a consistency check

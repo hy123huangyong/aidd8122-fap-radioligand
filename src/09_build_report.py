@@ -25,7 +25,7 @@ from docx.shared import Cm, Inches, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[1]
 TAB = ROOT / "results" / "tables"
 FIG = ROOT / "results" / "figures"
-OUT = ROOT / "report" / "AIDD8122_Final_Report_HuangYong.docx"
+OUT = ROOT / "report" / "AIDD8122_Final_Report_HuangYong_P2600222_v2.docx"
 TEMPLATE = Path("E:/AIDD/8122最终作业/AIDD8122_Final_Project_Report_Template.docx")
 
 TITLE = ("Trust Before Throughput: Benchmarking, Uncertainty-Aware Screening and "
@@ -35,6 +35,22 @@ SID = "P2600222"
 DATE = "16/11/2026"
 
 BODY_FONT = "Times New Roman"
+
+# Repository link printed in Appendix A.  Set it once, either by writing the URL
+# into <project>/repo_url.txt or by exporting AIDD_REPO_URL, and rebuild — no
+# need to touch the template text below.
+REPO_PLACEHOLDER = "the submitted project repository (folder 03_Code/ of this submission package)"
+
+
+def repo_url() -> str:
+    import os
+
+    f = ROOT / "repo_url.txt"
+    if f.exists():
+        url = f.read_text(encoding="utf-8").strip()
+        if url:
+            return url
+    return os.environ.get("AIDD_REPO_URL", "").strip() or REPO_PLACEHOLDER
 
 
 # --------------------------------------------------------------------- helpers
@@ -79,8 +95,37 @@ def para(doc, text="", size=12, bold=False, italic=False, align="justify",
     return p
 
 
+def strip_heading_numbering(doc):
+    """Remove the template's automatic multi-level list from Heading 1-3.
+
+    The MPU template binds Heading 1/2 to a numbering definition that renders
+    "§1." and "1.1.". Section numbers in this report are written into the
+    heading text ("§5.9 …", "5.9 …"), so leaving the automatic numbering in
+    place produces doubled labels in the body and, more visibly, in the TOC
+    ("§2. §1. Introduction").
+    """
+    for name in ("Heading 1", "Heading 2", "Heading 3"):
+        try:
+            st = doc.styles[name]
+        except KeyError:
+            continue
+        ppr = st.element.find(qn("w:pPr"))
+        if ppr is None:
+            continue
+        for numpr in ppr.findall(qn("w:numPr")):
+            ppr.remove(numpr)
+
+
 def heading(doc, text, level=1, page_break=False):
-    p = doc.add_paragraph()
+    # Apply the template's named Heading 1/2 styles: Word's navigation pane
+    # and the TOC \o "1-2" switch both key off the style name, not on a bare
+    # outlineLvl.  Kept an explicit outlineLvl as a fallback for readers that
+    # ignore styles, and forced black text so a style's accent colour cannot
+    # leak into the printed report.
+    try:
+        p = doc.add_paragraph(style=f"Heading {level}")
+    except KeyError:
+        p = doc.add_paragraph()
     pf = p.paragraph_format
     pf.keep_with_next = True
     pf.page_break_before = page_break
@@ -88,12 +133,27 @@ def heading(doc, text, level=1, page_break=False):
     pf.space_after = Pt(6 if level == 1 else 4)
     pf.line_spacing = 1.2
     r = p.add_run(text)
-    set_run(r, size=14 if level == 1 else 12, bold=True)
-    # outline level so the TOC field picks it up
+    set_run(r, size=14 if level == 1 else 12, bold=True,
+            color=(0x1A, 0x22, 0x30))
     ppr = p._p.get_or_add_pPr()
-    ol = OxmlElement("w:outlineLvl")
-    ol.set(qn("w:val"), str(level - 1))
-    ppr.append(ol)
+    # belt and braces: even if a reader keeps the style numbering, numId 0 on
+    # the paragraph suppresses it.
+    numpr = OxmlElement("w:numPr")
+    ilvl = OxmlElement("w:ilvl")
+    ilvl.set(qn("w:val"), "0")
+    numid = OxmlElement("w:numId")
+    numid.set(qn("w:val"), "0")
+    numpr.append(ilvl)
+    numpr.append(numid)
+    pstyle = ppr.find(qn("w:pStyle"))
+    if pstyle is not None:
+        pstyle.addnext(numpr)
+    else:
+        ppr.insert(0, numpr)
+    if ppr.find(qn("w:outlineLvl")) is None:
+        ol = OxmlElement("w:outlineLvl")
+        ol.set(qn("w:val"), str(level - 1))
+        ppr.append(ol)
     if level == 1:
         p.paragraph_format.page_break_before = False
     return p
@@ -146,11 +206,12 @@ def bullet(doc, text, size=11.5):
     return p
 
 
-def table(doc, header, rows, caption=None, widths=None, size=9, align=None, fixed=False):
+def table(doc, header, rows, caption=None, widths=None, size=9, align=None, fixed=False,
+          tight=False):
     if caption:
         c = doc.add_paragraph()
-        c.paragraph_format.space_before = Pt(10)
-        c.paragraph_format.space_after = Pt(3)
+        c.paragraph_format.space_before = Pt(4 if tight else 10)
+        c.paragraph_format.space_after = Pt(2 if tight else 3)
         c.paragraph_format.line_spacing = 1.0
         c.paragraph_format.keep_with_next = True
         parts = caption.split("**")
@@ -184,8 +245,8 @@ def table(doc, header, rows, caption=None, widths=None, size=9, align=None, fixe
         for i, v in enumerate(row):
             cells[i].text = ""
             p = cells[i].paragraphs[0]
-            p.paragraph_format.space_after = Pt(1)
-            p.paragraph_format.space_before = Pt(1)
+            p.paragraph_format.space_after = Pt(0 if tight else 1)
+            p.paragraph_format.space_before = Pt(0 if tight else 1)
             p.alignment = (WD_ALIGN_PARAGRAPH.LEFT if i == 0
                            else (align[i] if align else WD_ALIGN_PARAGRAPH.CENTER))
             r = p.add_run(str(v))
@@ -202,10 +263,31 @@ def table(doc, header, rows, caption=None, widths=None, size=9, align=None, fixe
         for row in t.rows:
             for i, w in enumerate(widths):
                 row.cells[i].width = Cm(w)
+    # A row must never be sliced in half by a page break, and a short table
+    # should not be split at all: six rows orphaned two-and-four across a page
+    # boundary read worse than a little white space at the foot of the page.
+    for row in t.rows:
+        trpr = row._tr.get_or_add_trPr()
+        cs = OxmlElement("w:cantSplit")
+        cs.set(qn("w:val"), "true")
+        trpr.append(cs)
+    if len(rows) <= 10:
+        for row in t.rows[:-1]:
+            for cell in row.cells:
+                for pp in cell.paragraphs:
+                    pp.paragraph_format.keep_with_next = True
+
     # spacing paragraph after the table
     sp = doc.add_paragraph()
-    sp.paragraph_format.space_after = Pt(4)
-    sp.paragraph_format.space_before = Pt(0)
+    if tight:
+        # an empty paragraph still occupies a full line; pin it to 2 pt so the
+        # three appendix tables do not each cost a blank line
+        sp.paragraph_format.space_after = Pt(0)
+        sp.paragraph_format.space_before = Pt(0)
+        sp.paragraph_format.line_spacing = Pt(2)
+    else:
+        sp.paragraph_format.space_after = Pt(4)
+        sp.paragraph_format.space_before = Pt(0)
     return t
 
 
@@ -231,6 +313,105 @@ def toc_field(doc):
     return p
 
 
+def fix_cover_banner(doc):
+    """Split the template faculty banner into two real paragraphs.
+
+    The template stores 'FACULTY OF APPLIED SCIENCES' and 'DOCTOR OF
+    PHILOSOPHY ...' in one paragraph separated by a <w:br/>.  Word renders it
+    correctly, but plain-text / PDF extractors concatenate the two lines into
+    'SCIENCESDOCTOR'.  Two paragraphs keep the visual layout and remove the
+    concatenation.
+    """
+    for p in list(doc.paragraphs):
+        if "FACULTY OF APPLIED SCIENCES" not in p.text or "\n" not in p.text:
+            continue
+        runs = list(p.runs)
+        br_i = next((i for i, r in enumerate(runs) if "<w:br" in r._r.xml), None)
+        if br_i is None or br_i + 1 >= len(runs):
+            continue
+        p._p.remove(runs[br_i]._r)                 # drop the line-break run
+        tail = doc.add_paragraph()
+        tail.style = p.style
+        tail.alignment = p.alignment
+        tail.paragraph_format.space_after = Pt(2)
+        for r in runs[br_i + 1:]:
+            p._p.remove(r._r)
+            tail._p.append(r._r)
+        p._p.addnext(tail._p)
+        break
+
+
+def fix_footer(doc):
+    """Use NUMPAGES (whole document) instead of SECTIONPAGES."""
+    for section in doc.sections:
+        for footer in (section.footer, section.first_page_footer,
+                       section.even_page_footer):
+            for instr in footer._element.iter(qn("w:instrText")):
+                if instr.text and "SECTIONPAGES" in instr.text:
+                    instr.text = instr.text.replace("SECTIONPAGES", "NUMPAGES")
+            # neutralise cached field results; Word refreshes them on update
+            for t in footer._element.iter(qn("w:t")):
+                if t.text and t.text.strip().isdigit():
+                    t.text = "1"
+
+
+def set_metadata(doc):
+    """Replace WPS-template remnants with the actual author / date."""
+    from datetime import datetime, timezone
+
+    cp = doc.core_properties
+    cp.author = "Huang Yong"
+    cp.last_modified_by = "Huang Yong"
+    cp.title = TITLE
+    cp.subject = "AIDD8122 Final Project: FAP-selective radioligand warheads"
+    cp.keywords = ("fibroblast activation protein; radiopharmaceutical; "
+                   "scaffold split; conformal prediction; multi-objective design")
+    cp.category = "AIDD8122 Final Project"
+    cp.comments = ("Generated by src/09_build_report.py from the MPU report "
+                   "template; data: ChEMBL release 37 (May 2026).")
+    cp.created = datetime(2026, 11, 5, 0, 0, 0)
+    cp.modified = datetime.now(timezone.utc).replace(tzinfo=None)
+    cp.revision = 1
+    # python-docx cannot set last_printed to None; sanitize_package() strips
+    # the stale <cp:lastPrinted> node from core.xml after saving.
+
+
+def sanitize_package(path: Path):
+    """Remove core.xml lastPrinted and stale WPS application statistics."""
+    import re as _re
+    import zipfile
+
+    with zipfile.ZipFile(path) as z:
+        items = [(n, z.read(n)) for n in z.namelist()]
+    tmp = path.with_name(path.name + ".tmp")
+    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+        for name, data in items:
+            if name == "docProps/core.xml":
+                s = data.decode("utf-8")
+                s = _re.sub(r"<cp:lastPrinted[^>]*>.*?</cp:lastPrinted>", "", s)
+                data = s.encode("utf-8")
+            elif name == "docProps/app.xml":
+                s = data.decode("utf-8")
+                s = _re.sub(r"<Application>.*?</Application>",
+                            "<Application>Microsoft Office Word</Application>", s)
+                # Word recomputes these when it saves the document
+                s = _re.sub(r"<Words>\d+</Words>", "<Words>0</Words>", s)
+                s = _re.sub(r"<Characters>\d+</Characters>", "<Characters>0</Characters>", s)
+                s = _re.sub(r"<Paragraphs>\d+</Paragraphs>", "<Paragraphs>0</Paragraphs>", s)
+                data = s.encode("utf-8")
+            elif name == "word/settings.xml":
+                # Word COM re-saves the .docx when it inserts the TOC; without
+                # this flag it downsamples every embedded figure to screen
+                # resolution (1364 px), which would silently degrade the 2414 px
+                # source figures used in the report.
+                s = data.decode("utf-8")
+                if "doNotCompressImages" not in s:
+                    s = _re.sub(r"(<w:settings[^>]*>)", r"\1<w:doNotCompressImages/>", s, count=1)
+                data = s.encode("utf-8")
+            z.writestr(name, data)
+    tmp.replace(path)
+
+
 # ------------------------------------------------------------------ data loads
 def load_numbers() -> dict:
     d = {}
@@ -252,6 +433,24 @@ def load_numbers() -> dict:
     d["gen_top"] = pd.read_csv(top) if top.exists() else pd.DataFrame()
     arch = TAB / "generative_archive.csv"
     d["gen_arc"] = pd.read_csv(arch) if arch.exists() else pd.DataFrame()
+
+    # --- optimisation-pass analyses (route A).  Every file below is produced
+    # by a numbered script in 03_Code/src/ and is fully reproducible.
+    optional = {
+        "dois": "reference_dois.csv",
+        "retro": "retrosynthesis.csv",
+        "radiolabel": "radiolabel_feasibility.csv",
+        "boot": "selectivity_bootstrap.csv",
+        "strat": "selectivity_stratified.csv",
+        "mondrian": "mondrian_conformal.csv",
+    }
+    for key, fname in optional.items():
+        f = TAB / fname
+        d[key] = pd.read_csv(f) if f.exists() else pd.DataFrame()
+    if not d["dois"].empty:
+        d["doi_map"] = dict(zip(d["dois"].ref, d["dois"].doi))
+    else:
+        d["doi_map"] = {}
     return d
 
 
@@ -275,7 +474,7 @@ def build_body(doc, D):
          "This project asks a deliberately narrow question: given that record, what can machine "
          "learning actually deliver for radiopharmaceutical design, and where should a medicinal "
          "chemist refuse to trust it? We curated 972 ChEMBL bioactivities into 384 unique FAP "
-         "inhibitors (162 Murcko scaffolds) and benchmarked five models under random, scaffold and "
+         "inhibitors (161 Murcko scaffolds) and benchmarked five models under random, scaffold and "
          "time splits. Random splitting suggests excellent accuracy (XGBoost R² = 0.75), but a time "
          "split that mimics prospective use collapses to R² = −0.79, because the post-2019 "
          "literature describes a different chemical series (median molecular weight +80 Da, median "
@@ -333,7 +532,24 @@ def build_body(doc, D):
          "which share the catalytic fold and are widely expressed; a ligand that inhibits DPP4 will "
          "carry a systemic off-target liability that no dosimetry can compensate. The second is "
          "selectivity against FAP expressed in healthy tissue, which is a pharmacokinetic rather than "
-         "an affinity problem and is not addressed here. This project concerns the first.")
+         "an affinity problem and is outside the ligand-based model built here — but its chemical "
+         "preconditions are not unknowable. Appendix B works out, for the six generated structures, "
+         "where a radionuclide could be attached, what a chelator would add to molecular weight "
+         "and polar surface area, and why that modification would push a candidate outside the "
+         "applicability domain established in Section 5.6. This project concerns the first problem; "
+         "the second is recorded as a bounded, testable gap rather than left implicit.")
+    para(doc,
+         "The distinction matters because a generative model returns a warhead, not a "
+         "radiopharmaceutical. A 18F label needs a displaceable leaving group on an aryl or alkyl "
+         "carbon, while 68Ga and 177Lu need a macrocyclic chelator such as DOTA or NOTA. None of "
+         "the six highest-ranked designs in Table 10 carries a chelator (Appendix B, Table B1), "
+         "and a DOTA mono-amide conjugate would add about 358 Da, taking the median molecular "
+         "weight from 499 to 857 Da and the topological polar surface area from 126 to about "
+         "248 Å². Those are properties of a different chemical class from the 384 FAP inhibitors "
+         "the model was trained on, so a predicted pFAP for the conjugated molecule would fall "
+         "outside the applicability domain as well. Tumour retention and normal-tissue background "
+         "cannot be inferred from this model; the testable next step is to synthesise a small "
+         "chelator-bearing subset and measure it, rather than to extrapolate from the warhead.")
     heading(doc, "1.3 Why machine learning, and why the usual evaluation is not enough", 2)
     para(doc,
          "Public bioactivity data for FAP are an order of magnitude smaller than for kinase targets: "
@@ -488,12 +704,27 @@ def build_body(doc, D):
     para(doc,
          "The project is deliberately restricted to ligand-based modelling of the FAP warhead region; "
          "it does not model the chelator, the radiometal, or in vivo pharmacokinetics, and it does not "
-         "perform docking or free-energy calculations. Success was defined in advance as: (i) a "
-         "scaffold-split R² above 0.5 with a screening AUROC above 0.85 for the best model, which "
-         "would justify use as a triage filter; (ii) a measurable and statistically defensible "
-         "difference between modelling protocols; and (iii) conformal intervals whose empirical "
-         "coverage can be predicted from the applicability domain. All three were met, although the "
-         "third only conditionally.")
+         "perform docking or free-energy calculations. Three success criteria were fixed before any "
+         "model was fitted. Their disposition at the end of the project is reported explicitly below, "
+         "because a pre-registered criterion is only useful if a partial or negative result is allowed "
+         "to stand.")
+    table(doc,
+          ["Pre-registered criterion", "Threshold", "Disposition", "Evidence"],
+          [["C1  Triage-grade accuracy", "scaffold-split R² > 0.5 and screening AUROC > 0.85",
+            "Achieved", "Table 2: R² 0.68, AUROC 0.94 (XGBoost, five seeds)"],
+           ["C2  Protocol effect", "a measurable, seed-replicated difference between protocols",
+            "Achieved", "Table 2: R² 0.75 (random) to −0.79 (time); s.d. ≤ 0.06 per cell"],
+           ["C3  Coverage predictable from the AD", "coverage near nominal in each AD class",
+            "Partially achieved",
+            "Table 7: 0.76 in-domain, 0.50 out-domain at nominal 0.80"]],
+          caption="**Pre-registered success criteria and their disposition.** C3 is deliberately "
+                  "recorded as partial: the applicability domain does predict where conformal "
+                  "coverage fails, but the intervals themselves are not valid out of domain, which "
+                  "is a weaker outcome than the criterion anticipated.",
+          widths=[3.9, 4.6, 2.5, 5.0], size=8.0)
+    para(doc,
+         "Stating C3 as partial rather than met is the point of the exercise: the analysis that "
+         "validated the first two criteria is the same analysis that refused the third.")
 
     # ------------------------------------------------------------------ methods
     heading(doc, "§4. Methods and Materials", 1)
@@ -507,7 +738,9 @@ def build_body(doc, D):
            "(A), represented by combined fingerprints and descriptors and modelled under three split "
            "protocols (B), audited with applicability-domain, conformal and temporal analyses (C), and "
            "finally used as scoring functions inside a multi-objective graph genetic algorithm (D). "
-           "The dashed arrow indicates that error analysis feeds back into feature and model choice.")
+           "The dashed arrow indicates that error analysis feeds back into feature and model "
+           "choice. ChEMBL release 37; RDKit 2026.09.1 / Matplotlib 3.11.2; schematic of the "
+           "01–09 pipeline, no plotted observations.")
 
     heading(doc, "4.1 Data acquisition", 2)
     para(doc,
@@ -582,7 +815,12 @@ def build_body(doc, D):
          "The applicability domain is defined by chemical similarity: for each test compound, the "
          "maximum Tanimoto similarity to any training compound is computed over Morgan fingerprints. "
          "Test compounds are then binned by this similarity and the RMSE of each bin is reported, "
-         "which yields an operational rule (a similarity threshold) rather than a binary claim.")
+         "which yields an operational rule (a similarity threshold) rather than a binary claim. "
+         "A single threshold of 0.60 separates in-domain from out-of-domain compounds throughout "
+         "this report: it is the boundary at which RMSE begins to rise in Table 6 and at which "
+         "out-of-domain conformal coverage falls to 0.54 in Table 7. The narrower 0.1-wide bins "
+         "in Table 6 are descriptive partitions, not alternative decision rules; the 0.40 filter "
+         "in Section 4.9 is a novelty constraint on the generator and is a different quantity.")
     para(doc,
          "Uncertainty is quantified by split conformal prediction. Out-of-fold residuals are obtained "
          "by five-fold cross-validation inside the training set, and the conformal half-width is the "
@@ -621,11 +859,17 @@ def build_body(doc, D):
 
     heading(doc, "4.10 Implementation and reproducibility", 2)
     para(doc,
-         "All code is Python 3.13 with RDKit 2026.09.1 [27], scikit-learn 1.9.1, XGBoost 3.4.1 and "
-         "NumPy 2.5.4. The pipeline is organised as numbered scripts (fetch, curate, benchmark, "
-         "transfer, analysis, generative, figures, report), each writing a table or figure that the "
-         "next stage reads. The curated datasets, the full set of predictions and the code are "
-         "available in the repository listed in Appendix A.")
+         "All code is Python 3.13 with RDKit 2026.09.1 [27], scikit-learn 1.9.1, XGBoost 3.4.1, "
+         "NumPy 2.5.4, pandas 3.1.0 and Matplotlib 3.11.2. The pipeline is organised as numbered "
+         "scripts: 01 fetch, 02 curate, 03 benchmark, 04 transfer/selectivity, 05 trust analysis, "
+         "06 generative design, 07-08 figures, 09 this report, 10 presentation notes, 11 DOI "
+         "verification, 12 retrosynthetic/radiolabelling triage, 13 robustness analyses, 14 "
+         "summary reconciliation, 15 the content corrections of this optimisation pass, 16 the "
+         "evidence bundle (environment fingerprint, file manifest, reconciliation log) and 17 the "
+         "figure-restoration step that runs after Word saves the .docx. Each script writes a table or "
+         "figure that the next stage reads; random seeds, package versions and run logs are shipped "
+         "with the code. The curated datasets, the raw ChEMBL exports, the full prediction tables, "
+         "the environment fingerprint and a one-command reproduction guide are listed in Appendix A.")
 
     # ------------------------------------------------------------------ results
     heading(doc, "§5. Results and Discussion", 1)
@@ -675,7 +919,8 @@ def build_body(doc, D):
            "**Figure 2.** The curated datasets. (a) Potency coverage of the three targets; the dotted "
            "line marks 100 nM. (b) FAP compounds split by publication era, showing the shift towards "
            "larger, more potent molecules from 2019 onwards. (c) Scaffold diversity, which is low for FAP "
-           "relative to its compound count.")
+           "relative to its compound count. ChEMBL release 37; RDKit 2026.09.1; n = 384 / 512 / "
+           "4,338 compounds (FAP / PREP / DPP4); panel b n = 237 (2004–2018) and 147 (2019–2024).")
 
     heading(doc, "5.2 Accuracy depends more on the split than on the algorithm", 2)
     bench = D["bench"]
@@ -720,7 +965,9 @@ def build_body(doc, D):
            "standard deviations over five seeds. (b) Predicted versus measured pActivity for XGBoost "
            "under random and time splitting; the time-split cloud is compressed into a narrow band "
            "around pActivity 6 regardless of the measured value. (c) Early enrichment (EF10) on the "
-           "focused evaluation set; the dashed line marks the no-enrichment level.")
+           "focused evaluation set; the dashed line marks the no-enrichment level. ChEMBL "
+           "release 37; five seeds × five models × three protocols, n = 384 FAP compounds; "
+           "XGBoost 3.4.1 / scikit-learn 1.9.1.")
     para(doc,
          "This is the central empirical result of the project, and it is not an artefact of a small "
          "test set (n = 147). It is the direct consequence of the era structure documented in "
@@ -839,7 +1086,23 @@ def build_body(doc, D):
            "intervals, and the p-values are from Wilcoxon signed-rank tests. (b) Selectivity AUROC by "
            "split protocol and modelling strategy; error bars are 95% confidence intervals over "
            "twenty seeds. (c) Distribution of ΔpActivity for the dual-measured compounds against PREP "
-           "and DPP4.")
+           "and DPP4. ChEMBL release 37; five benchmark seeds, twenty selectivity seeds; n = 100 "
+           "FAP/PREP and 232 FAP/DPP4 dual-measured compounds.")
+    para(doc,
+         "Because the cliff is the strongest negative claim in this report, it was re-tested with a "
+         "paired bootstrap over the twenty seeds (Appendix C, Table C1). Pairing the random- and "
+         "scaffold-split AUROC obtained on the same seed gives a mean difference of 0.463 "
+         "(95% CI 0.392–0.532) for the indirect protocol and 0.454 (0.382–0.525) for the direct "
+         "one; 100% of 5,000 bootstrap replicates are positive. The collapse is therefore not an "
+         "artefact of seed variation.")
+    para(doc,
+         "A stratified re-analysis is less comforting (Appendix C, Table C2). The cliff persists in "
+         "the IC50-only stratum (Δ = 0.451, n = 70) and in the single-measurement stratum "
+         "(Δ = 0.523, n = 93), but it reverses in the small mixed-assay stratum "
+         "(Δ = −0.158, n = 30, only 13 evaluable random folds). The replicated stratum contains "
+         "just 7 compounds and cannot be fitted at all. Assay-type confounding cannot therefore be "
+         "excluded for that subgroup; the honest reading is that the cliff is robust for the "
+         "IC50-dominated bulk of the data and unresolved for the heterogeneous remainder.")
 
     heading(doc, "5.6 When can an error bar be believed?", 2)
     ad = D["ad"]
@@ -856,7 +1119,7 @@ def build_body(doc, D):
          "0.96 in the 0.5–0.6 bin and 0.95–1.12 below 0.5. The absolute magnitude of the effect is "
          "modest — roughly 0.3 log units between the best and worst bins — but it is monotone and it "
          "is the basis for a usable rule: a prediction supported by a similarity above 0.6 can be "
-         "quoted with an error comparable to assay noise, and below 0.5 it cannot.")
+         "quoted with an error comparable to assay noise, and below 0.6 it cannot.")
     conf = D["conf"]
     conf_g = conf.groupby(["protocol", "level"]).coverage.mean()
     rows = []
@@ -885,12 +1148,53 @@ def build_body(doc, D):
     figure(doc, FIG / "fig4_applicability_domain.png",
            "**Figure 5.** Applicability domain. (a) Absolute error against maximum Tanimoto "
            "similarity to the training set, with the median per bin overlaid. (b) RMSE grouped by "
-           "applicability class; the dashed line is the overall RMSE.")
+           "applicability class; the dashed line is the overall RMSE. ChEMBL release 37; "
+           "scaffold split, XGBoost, five seeds pooled, n = 384 FAP compounds; 0.6 AD threshold.")
     para(doc,
          "The practical rule that follows is a two-gate decision: compute the similarity, and only "
          "quote a conformal interval when the similarity exceeds 0.6. Below that threshold the model "
          "may still be useful for ranking a series internally, but its numeric interval should not "
          "appear in a synthesis decision.")
+    para(doc,
+         "A natural repair is class-conditional (Mondrian) conformal calibration: bin the "
+         "out-of-fold calibration residuals by how well each training compound is represented in "
+         "the training chemistry, and let each bin use its own quantile. Appendix C, Table C2 and "
+         "Figure 8 report that sensitivity analysis. Out-of-domain coverage at the 80% level rises "
+         "from 0.54 to 0.74 and at the 90% level from 0.77 to 1.00, while in-domain coverage is "
+         "essentially unchanged (0.77 to 0.74 and 0.88 to 0.88).")
+    para(doc,
+         "This is a diagnostic, not a deployable fix. Only 27 of roughly 280 training compounds "
+         "fall in the out-of-domain calibration bin, so its quantile is noisy: at the 90% level it "
+         "produces complete over-coverage (1.00) and more than doubles the interval width from 2.40 "
+         "to 5.01 log units. Conditional calibration restores nominal coverage by spending "
+         "precision, which is exactly the trade-off the rest of this report argues should be "
+         "reported rather than hidden behind a single reassuring number.")
+    figure(doc, FIG / "fig8_mondrian.png",
+           "**Figure 8.** Class-conditional conformal calibration under scaffold splitting "
+           "(mean over five seeds). Dark bars: global split conformal; light bars: bin-wise "
+           "quantiles. The dashed line is the nominal level. ChEMBL release 37; XGBoost, "
+           "five seeds, 0.6 applicability-domain threshold; n ≈ 280 training / ≈ 100 test "
+           "compounds per seed.")
+    para(doc,
+         "A natural repair is class-conditional (Mondrian) conformal calibration: bin the "
+         "out-of-fold calibration residuals by how well each training compound is represented in "
+         "the training chemistry, and let each bin use its own quantile. Appendix C, Table C3 and "
+         "Figure 8 report that sensitivity analysis. Out-of-domain coverage at the 80% level rises "
+         "from 0.54 to 0.74 and at the 90% level from 0.77 to 1.00, while in-domain coverage is "
+         "essentially unchanged (0.77 to 0.74 and 0.88 to 0.88).")
+    para(doc,
+         "This is a diagnostic, not a deployable fix. Only 27 of roughly 280 training compounds "
+         "fall in the out-of-domain calibration bin, so its quantile is noisy: at the 90% level it "
+         "produces complete over-coverage (1.00) and more than doubles the interval width from 2.40 "
+         "to 5.01 log units. Conditional calibration restores nominal coverage by spending "
+         "precision, which is exactly the trade-off the rest of this report argues should be "
+         "reported rather than hidden behind a single reassuring number.")
+    figure(doc, FIG / "fig8_mondrian.png",
+           "**Figure 8.** Class-conditional conformal calibration under scaffold splitting "
+           "(mean over five seeds). Dark bars: global split conformal; light bars: bin-wise "
+           "quantiles. The dashed line is the nominal level. ChEMBL release 37; XGBoost, "
+           "five seeds, 0.6 applicability-domain threshold; n ≈ 280 training / ≈ 100 test "
+           "compounds per seed.")
 
     heading(doc, "5.7 Prospective failure: the 2019 series shift", 2)
     tm = D["temporal"].set_index("setting")
@@ -918,7 +1222,9 @@ def build_body(doc, D):
     figure(doc, FIG / "fig5_temporal_drift.png",
            "**Figure 6.** Temporal drift. (a) Interpolation under random splitting. (b) Extrapolation "
            "to compounds published after 2018, before and after intercept recalibration. The "
-           "recalibrated points move onto the diagonal in level but remain uncorrelated in rank.")
+           "recalibrated points move onto the diagonal in level but remain uncorrelated in "
+           "rank. ChEMBL release 37; train ≤ 2018 (n = 237), test 2019–2024 (n = 147); single "
+           "fit at seed 0, XGBoost 3.4.1.")
 
     heading(doc, "5.8 Multi-objective generative design", 2)
     gen = D["gen"]
@@ -934,19 +1240,23 @@ def build_body(doc, D):
                      "qed": float(d.qed.median()), "sa": float(d.sa.median()),
                      "mw": float(d.mw.median()),
                      "best": float(nov.pFAP.max()),
+                     "mednov": float(nov.pFAP.median()),
                      "pass": float(len(ok) / len(nov)) if len(nov) else float("nan")}
     table(doc,
-          ["Campaign", "Archived", "Novel", "Scaffolds", "Median QED", "Median SA",
-           "Median MW (Da)", "Best novel pFAP", "Pass rate"],
+          ["Campaign", "Arch.", "Novel", "Scaf.", "QED", "SA", "MW (Da)",
+           "Median novel pFAP", "Best novel pFAP", "Pass rate"],
           [[stats[mo]["lab"], stats[mo]["n"], stats[mo]["novel"], stats[mo]["scaf"],
             f"{stats[mo]['qed']:.2f}", f"{stats[mo]['sa']:.2f}", f"{stats[mo]['mw']:.0f}",
-            f"{stats[mo]['best']:.2f}", f"{stats[mo]['pass']*100:.0f}%"]
+            f"{stats[mo]['mednov']:.2f}", f"{stats[mo]['best']:.2f}",
+            f"{stats[mo]['pass']*100:.0f}%"]
            for mo in ["ga", "affinity_only", "random"]],
           caption="**Table 9.** Outcome of the three design campaigns with an identical evaluation "
                   "budget (24 generations, population 96). Novelty = InChIKey absent from all three "
                   "curated datasets; pass rate = fraction of novel molecules with predicted pFAP ≥ 8 "
-                  "and selectivity margin ≥ 1.",
-          widths=[4.4, 1.7, 1.4, 1.8, 1.9, 1.7, 2.1, 2.2, 1.6], size=8.5)
+                  "and selectivity margin ≥ 1. QED, SA and MW are medians over the whole archive; "
+                  "the two pFAP columns are over novel molecules only. All values are recomputed "
+                  "from generative_archive.csv by this script.",
+          widths=[3.2, 1.2, 1.2, 1.1, 1.1, 1.0, 1.4, 2.2, 1.9, 1.3], size=8.0)
     para(doc,
          "All three campaigns quickly reach the ceiling of the affinity model (best predicted pFAP "
          "9.6–9.7, Figure 7b), which is itself a warning: an ensemble trained on 384 compounds cannot "
@@ -959,17 +1269,30 @@ def build_body(doc, D):
          "median molecular weight inflates to 548 Da, because polar atoms are traded for hydrophobic "
          "bulk wherever the model rewards it.")
     para(doc,
-         "The multi-objective campaign pays a small affinity price (median novel pFAP 8.24 versus "
-         "9.36 for affinity-only) and in exchange returns the most usable chemistry of the three "
-         "regimes: 115 distinct Murcko scaffolds against 80–83 for the controls, a median QED of "
-         "0.61, a median synthetic-accessibility score of 2.93 (easier to make than either control) "
-         "and a median molecular weight of 413 Da, squarely in the range of the clinical FAPIs. "
-         "61% of its novel molecules clear the pre-registered design thresholds of pFAP ≥ 8 and "
-         "selectivity margin ≥ 1, essentially the same pass rate as the random control (60%) — the "
-         "value of the objectives shows up in diversity and developability rather than in the pass "
-         "rate, which is exactly what a Pareto front should do. The top-ranked novel molecules are "
-         "quinoline-carboxamide derivatives with modified amide linkers, i.e. plausible next analogues "
-         "rather than exotic chemistry (Table 10).")
+         "The multi-objective campaign pays a small affinity price (median novel pFAP 8.24 in "
+         "Table 9 versus 9.36 for affinity-only) and in exchange returns the most usable chemistry "
+         "of the three regimes: 115 distinct Murcko scaffolds against 80–83 for the controls, a "
+         "median QED of 0.61, a median synthetic-accessibility score of 2.93 (easier to make than "
+         "either control) and a median molecular weight of 413 Da, squarely in the range of the "
+         "clinical FAPIs. Its 61% pass rate is essentially the same as the random control (60%) — "
+         "the value of the objectives shows up in diversity and developability rather than in the "
+         "pass rate, which is exactly what a Pareto front should do.")
+    para(doc,
+         "Two features of Table 9 need to be read with care. First, the affinity-only campaign "
+         "shows a 100% pass rate, and this is a consequence of the metric's definition, not of "
+         "superior chemistry: selection drives all 369 of its novel molecules above pFAP 8, and "
+         "because the margin is pFAP minus the largest paralogue prediction, a high pFAP almost "
+         "automatically satisfies margin ≥ 1 as well. The pass rate is therefore close to a "
+         "restatement of the objective that campaign was given. Second, the same circularity "
+         "explains why adding selectivity and developability pressure lowers the pass rate to "
+         "61%: the optimiser is no longer allowed to spend its entire budget on pFAP. A post-hoc "
+         "look at what the four-objective budget bought is more informative than the pass rate — "
+         "the affinity-only archive has median QED 0.25, median MW 548 Da and 83 scaffolds, "
+         "whereas the four-objective archive has median QED 0.61, median MW 413 Da and 115 "
+         "scaffolds at a median pFAP of 8.24 that still clears the pre-registered threshold. The "
+         "top-ranked novel molecules are quinoline-carboxamide derivatives with modified amide "
+         "linkers, i.e. plausible next analogues rather than exotic chemistry (Table 10), but see "
+         "Section 5.11 and Appendix B for why their warhead is not the clinical FAPI warhead.")
     top = D["gen_top"].head(6)
     table(doc,
           ["Structure (SMILES)", "pFAP", "Margin", "QED", "SA", "MW (Da)"],
@@ -984,9 +1307,43 @@ def build_body(doc, D):
            "population per generation: random selection drifts downwards, affinity-only hill-climbing "
            "rises, multi-objective selection stays stable. (b) Archived molecules in the "
            "affinity-margin plane; dotted lines mark the design thresholds. (c) Drug-likeness of the "
-           "archived molecules by campaign.")
+           "archived molecules by campaign. ChEMBL release 37; 24 generations × population "
+           "96, 384 archived molecules per campaign; RDKit 2026.09.1, five-seed XGBoost "
+           "ensemble scoring.")
 
-    heading(doc, "5.9 Discussion", 2)
+    heading(doc, "5.9 The designs are warheads, not radioligands", 2)
+    para(doc,
+         "A potency model returns a molecule that binds; a radiopharmaceutical has to be made and "
+         "labelled as well. Both questions were asked of the six top-ranked designs, using only "
+         "rule-based, reproducible calculations (Appendix B). Retrosynthetically the series is "
+         "unremarkable: BRICS disconnection gives 7–10 fragments (median 9), the estimated route is "
+         "7–10 steps, and the synthetic-accessibility score lies between 2.97 and 4.40 (median 3.24), "
+         "which is the range of ordinary medicinal chemistry rather than of a difficult natural "
+         "product. All six are assembled from a quinoline carboxylic acid and a proline-derived "
+         "amine, which is the same logic as the published FAPI series. These estimates are "
+         "disconnection heuristics, not validated routes, and no reaction in Table B2 has been run.")
+    para(doc,
+         "The radiochemical audit is where the designs fail. None of the six carries a chelator and "
+         "none exposes a free conjugation handle: every heteroatom is already engaged in an amide or "
+         "in the warhead. 68Ga and 177Lu labelling requires a chelator; 18F labelling requires a "
+         "displaceable leaving group; neither is present in any generated structure. Grafting DOTA "
+         "onto the nearest carboxylic acid moves the median molecular weight from 498.6 to 856.9 Da "
+         "(851–922 Da across the series) and the median TPSA from 126.0 to 247.7 Å². The curated FAP "
+         "training set has a median molecular weight of 401.4 Da and a 95th percentile of 557.3 Da, "
+         "and only 2.3% of its compounds exceed 800 Da. The conjugated ligand therefore leaves the "
+         "applicability domain of the very model that scored it, which is a quantitative statement "
+         "that the optimised quantity and the deliverable molecule are not the same object.")
+    para(doc,
+         "The warhead mismatch compounds this. Five of the six designs carry an α-diketone or "
+         "ketoamide electrophile, whereas the clinical FAPI tracers use a prolyl nitrile that forms a "
+         "reversible covalent adduct with the catalytic serine; only T10-6 recovers the clinical "
+         "chemotype. A model trained on a few hundred compounds dominated by one warhead class will "
+         "happily reward a different, more reactive one, because both occupy the same descriptor "
+         "neighbourhood. The fix is not a better regressor: the design objective has to include the "
+         "linker, the chelator and the labelling chemistry, and candidates have to be re-scored after "
+         "conjugation. That is a change of design space, and it is the single most useful thing this "
+         "audit produced.")
+    heading(doc, "5.10 Discussion", 2)
     para(doc,
          "Three findings deserve emphasis. First, the choice of evaluation protocol changes the "
          "conclusion more than the choice of algorithm: the same XGBoost model is excellent (R² 0.75) "
@@ -1007,7 +1364,7 @@ def build_body(doc, D):
          "predicting it across series is not currently possible with 100 dual-measured compounds. "
          "Design campaigns should therefore treat selectivity as a filter to be verified "
          "experimentally rather than as an objective to be optimised in silico.")
-    heading(doc, "5.10 Limitations", 2)
+    heading(doc, "5.11 Limitations", 2)
     for b in [
         "The dataset is one snapshot of ChEMBL and inherits its biases: publication bias towards "
         "potent compounds, inconsistent assay conditions, and an over-representation of the "
@@ -1022,6 +1379,22 @@ def build_body(doc, D):
         "more adventurous campaign would generate more diverse but less assessable chemistry.",
         "Temporal analysis uses publication year as a proxy for availability; a true prospective "
         "test would require an external, later dataset.",
+        "Five of the six highest-ranked designs in Table 10 carry an alpha-diketone / ketoamide "
+        "electrophile, whereas clinical FAPI tracers use a prolyl nitrile warhead that forms a "
+        "reversible covalent adduct with the catalytic serine. The generated molecules are "
+        "therefore not close analogues of the clinical series: pFAP values above 9.5 place them "
+        "inside the model's confident region, not inside a validated SAR series, and imply "
+        "neither potency nor synthetic tractability (Appendix B).",
+        "No protein-structure, docking, pharmacophore or free-energy calculation was performed. "
+        "The assignment brief lists molecular docking and structure prediction as possible "
+        "directions, not as required deliverables, so this project stays with ligand-based "
+        "methods. Adding a docking score would create a second, uncalibrated confidence scale "
+        "and would contradict the audit framing of this report; if structure-based work is "
+        "undertaken later it should be used only for qualitative binding-mode explanations and "
+        "be reported with the same applicability-domain and failure checks as the models here.",
+        "The selectivity cliff is robust in the IC50-dominated bulk of the paired data but "
+        "reverses in a 30-compound mixed-assay stratum (Appendix C, Table C2); assay-type "
+        "confounding in that subgroup cannot be excluded.",
     ]:
         bullet(doc, b)
 
@@ -1128,6 +1501,9 @@ def build_body(doc, D):
         "of FAPI RLT in oncology: a systematic review. Theranostics. 2025;15(9):4084–4100.",
     ]
     for i, ref in enumerate(refs, 1):
+        doi = D["doi_map"].get(i, "")
+        if doi:
+            ref = f"{ref.rstrip('.')} doi:{doi}."
         p = doc.add_paragraph()
         p.paragraph_format.space_after = Pt(3)
         p.paragraph_format.line_spacing = 1.15
@@ -1141,19 +1517,153 @@ def build_body(doc, D):
     # ----------------------------------------------------------------- appendix
     heading(doc, "Appendix A. Code and data availability", 1)
     para(doc,
-         "The complete project — numbered analysis scripts, curated datasets, prediction tables and "
-         "figure-generation code — is available at:")
-    para(doc, "https://github.com/huangyong/fap-aidd-8122", align="center", italic=True)
+         "The complete project is submitted as a single package, "
+         "Submission_HuangYong_P2600222/. Its 03_Code/ directory is the evidence bundle referenced "
+         "by this report:")
     para(doc,
-         "The repository is organised as src/01_fetch_chembl.py through src/09_build_report.py, with "
-         "data/raw holding the retrieved ChEMBL records and results/tables holding every number "
-         "reported in this document. Running the scripts in numerical order reproduces all figures "
-         "and tables from the public API; a pinned requirements file and a short README are included.")
+         "03_Code/README.md — one-command reproduction, table-to-script map and environment "
+         "fingerprint; 03_Code/requirements.txt — pinned dependency versions; 03_Code/src/ — "
+         "scripts 01–17 in execution order; 03_Code/data/raw/ — the three ChEMBL release-37 JSON "
+         "exports together with their retrieval date and API query strings; 03_Code/data/processed/ "
+         "— the 972 → 438 → 384 curation chain; 03_Code/results/tables/ — every number quoted in "
+         "Tables 1–10 and Appendices B–C; 03_Code/results/figures/ — all eight figures at "
+         "≥2,000 px; 03_Code/logs/ — random seeds, package versions, runtime and the reconciliation "
+         "log. Running the scripts in numerical order from README.md regenerates Tables 1, 2, 8, "
+         "9 and 10 from the public API without any manual step.")
+    para(doc,
+         "The ChEMBL snapshot is release 37 (May 2026), targets "
+         "CHEMBL4683 / CHEMBL3202 / CHEMBL284; the environment is Python 3.13, RDKit 2026.09.1 "
+         "[27], scikit-learn 1.9.1, XGBoost 3.4.1, NumPy 2.5.4, pandas 3.1.0 and Matplotlib 3.11.2, "
+         "on Windows 11. All five benchmark seeds and all twenty selectivity seeds are fixed in "
+         "the scripts.")
+    para(doc, "Version-control location: " + repo_url(), align="center", italic=True)
+
+    # -------------------------------------------------------- appendix B
+    heading(doc, "Appendix B. Radioligand feasibility and retrosynthetic triage", 1)
+    para(doc,
+         "This appendix closes the gap left open in Section 1.2. It is a rule-based structural "
+         "analysis, not a literature-verified synthesis: BRICS disconnections, reaction "
+         "assignments and step counts are heuristics computed from the molecular graph by "
+         "src/12_design_feasibility.py, and no reaction, yield or supplier check was performed. "
+         "Descriptors are RDKit calculations; the chelator figures are stoichiometric estimates "
+         "for a DOTA mono-amide (DOTA free acid 376.4 Da; conjugation adds 358.4 Da).")
+    lab = D["radiolabel"]
+    table(doc,
+          ["ID", "Warhead", "MW (Da)", "TPSA (Å²)", "Chelator", "MW + DOTA (Da)"],
+          [[r.id, r.warhead, f"{r.MW_Da:.1f}", f"{r.TPSA:.1f}",
+            r.chelator_present, f"{r.MW_after_DOTA_est:.1f}"] for r in lab.itertuples()],
+          caption="**Table B1.** Calculated properties of the six highest-ranked novel designs "
+                  "(Table 10) and the estimated effect of conjugating one DOTA chelator. None of "
+                  "the six carries a chelator; median MW rises from 498.6 to 856.9 Da and median "
+                  "TPSA from 126.0 to 247.7 Å², which is outside the training chemistry of "
+                  "Table 1. Source: radiolabel_feasibility.csv.",
+          widths=[1.6, 3.2, 1.8, 1.9, 2.0, 2.7], size=8.0)
+    para(doc,
+         "The labelling handles lead to the same conclusion. A 18F label requires a displaceable "
+         "leaving group on an aryl or alkyl carbon; the fluorine atoms present in these designs "
+         "are stable aryl-F or gem-difluoro substituents, not leaving groups. 68Ga and 177Lu "
+         "require a macrocyclic chelator, and every nitrogen and oxygen in the six structures is "
+         "already engaged in an amide or in the electrophilic warhead, so there is no free amine "
+         "or carboxylate for a chelator coupling. All three radionuclide routes therefore demand "
+         "a structural modification first — and the modified molecule would no longer resemble "
+         "the 384 compounds that define the model's applicability domain. This is why tumour "
+         "retention and normal-tissue background are declared out of scope here rather than "
+         "predicted: they are pharmacokinetic properties of a conjugate this model has never "
+         "seen. The testable next step is narrow — synthesise three to five chelator-bearing "
+         "analogues, measure affinity and logD, and check whether they still fall inside the "
+         "0.6 similarity gate.")
+    ret = D["retro"]
+    table(doc,
+          ["ID", "Warhead", "BRICS frags", "Est. steps", "SA", "Dominant disconnection"],
+          [[r.id,
+            "alpha-diketone / ketoamide" if "alpha" in r.warhead else "prolyl nitrile",
+            int(r.brics_fragments), int(r.estimated_steps), f"{r.SA_score:.2f}",
+            r.key_reactions.split(";")[0].strip()] for r in ret.itertuples()],
+          caption="**Table B2.** Rule-based retrosynthetic triage of the six designs. BRICS "
+                  "fragments are graph disconnections; the step count is a heuristic "
+                  "(one coupling per junction plus one interconversion per specialised warhead), "
+                  "not an experimental route. Source: retrosynthesis.csv.",
+          widths=[1.5, 3.2, 1.7, 1.6, 1.1, 5.1], size=8.0)
+    para(doc,
+         "The medicinal-chemistry answer to the warhead question is therefore: yes, an "
+         "alpha-diketone is accessible (oxidation of the corresponding alpha-hydroxy ketone, "
+         "followed by amide couplings onto a quinoline-4-carboxamide and a proline-derived "
+         "amine), but it is not the clinical FAPI warhead. Clinical tracers use a prolyl nitrile "
+         "that forms a reversible covalent adduct with the catalytic serine; only the sixth "
+         "design in Table 10 retains that motif. A high predicted pFAP for the first five "
+         "consequently says that the optimizer found the model's confident region for a "
+         "different chemotype, not that it rediscovered FAPI-04. This appendix supplies a "
+         "triage and a set of checkable questions, not a claimed synthesis.")
+
+    # -------------------------------------------------------- appendix C
+    heading(doc, "Appendix C. Robustness analyses", 1)
+    para(doc,
+         "All three analyses below reuse the existing ChEMBL release-37 tables generated by "
+         "src/13_robustness.py: no external dataset and no new model class was introduced. They "
+         "were added to test, rather than to decorate, the two strongest claims in the report — "
+         "the selectivity cliff and the out-of-domain conformal failure.")
+    boot = D["boot"]
+    table(doc,
+          ["Protocol", "Paired seeds", "AUROC random [95% CI]",
+           "AUROC scaffold [95% CI]", "Paired Δ [95% CI]"],
+          [[r.protocol, int(r.n_paired_seeds),
+            f"{r.AUROC_random:.3f} {r.random_CI95}",
+            f"{r.AUROC_scaffold:.3f} {r.scaffold_CI95}",
+            f"{r.paired_delta:.3f} [{r.delta_CI95_low:.3f}, {r.delta_CI95_high:.3f}]"]
+           for r in boot.itertuples()],
+          caption="**Table C1.** Paired bootstrap over twenty seeds (5,000 replicates, seed 0 "
+                  "paired with seed 0). The random- and scaffold-split AUROCs are differenced "
+                  "within the same seed, so the interval describes the cliff itself. Source: "
+                  "selectivity_bootstrap.csv.",
+          widths=[2.2, 2.0, 3.7, 3.7, 3.0], size=8.0, tight=True)
+    strat = D["strat"]
+    table(doc,
+          ["Stratum", "n", "AUROC random", "AUROC scaffold", "Δ", "Folds (r / s)"],
+          [[r.stratum, int(r.n), fmt(r.AUROC_random, 3), fmt(r.AUROC_scaffold, 3),
+            fmt(r.cliff_delta, 3), f"{fmt(r.n_folds_random, 0)} / {fmt(r.n_folds_scaffold, 0)}"]
+           for r in strat.itertuples()],
+          caption="**Table C2.** Stratified re-analysis of the selectivity experiment using the "
+                  "identical twenty-seed protocol, restricted to each stratum. Strata with "
+                  "n < 30 have unstable AUROCs; the mixed-assay stratum reverses the cliff and "
+                  "the replicated stratum (n = 7) cannot be fitted. Source: "
+                  "selectivity_stratified.csv.",
+          widths=[4.4, 1.1, 2.3, 2.4, 1.4, 2.6], size=8.0, tight=True)
+    mc = (D["mondrian"].groupby(["level", "domain"], as_index=False)
+          [["coverage_global", "coverage_mondrian", "width_global", "width_mondrian"]].mean())
+    table(doc,
+          ["Nominal", "Domain", "Global coverage", "Mondrian coverage",
+           "Global width", "Mondrian width"],
+          [[f"{r.level:.0%}", r.domain.replace("_", " "),
+            f"{r.coverage_global:.3f}", f"{r.coverage_mondrian:.3f}",
+            f"{r.width_global:.2f}", f"{r.width_mondrian:.2f}"] for r in mc.itertuples()],
+          caption="**Table C3.** Class-conditional (Mondrian) conformal calibration, mean over "
+                  "five scaffold-split seeds. Calibration residuals are binned by each training "
+                  "compound's maximum Tanimoto similarity to the other training compounds, and "
+                  "test compounds use the bin matching their own similarity to the training set "
+                  "at the 0.6 threshold. Only about 27 training compounds fall in the "
+                  "out-of-domain bin. Source: mondrian_conformal.csv.",
+          widths=[1.8, 2.8, 2.5, 2.7, 2.2, 2.4], size=8.0, tight=True)
+    para(doc,
+         "Read together, these tables strengthen the first claim and qualify the repair of the "
+         "second. The paired interval excludes zero in every replicate, so the cliff is not seed "
+         "noise — but it reverses in a 30-compound mixed-assay stratum, so assay-type "
+         "confounding remains a live limitation rather than a dismissed one. Mondrian "
+         "calibration lifts out-of-domain coverage without touching in-domain coverage, yet it "
+         "does so with a 27-member calibration bin whose 90% quantile over-covers completely "
+         "(1.00) at more than twice the interval width. Conditional calibration is thus a "
+         "diagnostic of where exchangeability fails, not a new interval to quote in a synthesis "
+         "meeting. That is the same conclusion Section 5.6 reaches by a different route.")
 
 
 def main() -> None:
     D = load_numbers()
     doc = Document(str(TEMPLATE))
+
+    # ---- template hygiene (cover banner, footer field, document properties)
+    fix_cover_banner(doc)
+    fix_footer(doc)
+    set_metadata(doc)
+    strip_heading_numbering(doc)
 
     # ---- cover page
     tbl = doc.tables[0]
@@ -1268,6 +1778,7 @@ def main() -> None:
                             _r.text = _fix(_r.text)
 
     doc.save(str(OUT))
+    sanitize_package(OUT)
     print("saved", OUT)
 
 

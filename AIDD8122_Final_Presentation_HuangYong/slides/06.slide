@@ -8,7 +8,7 @@
     <Box style={{ flexDirection: 'row', gap: 20, marginTop: 22, width: 1120 }}>
       <Box style={{ flex: 1, background: '#E8EFF8', padding: '16px 20px', flexDirection: 'column' }}>
         <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#1E4FA8' }}>972 → 384</Text>
-        <Text style={{ fontSize: 15, color: '#1A2230', marginTop: 6, lineHeight: 1.4 }}>unique FAP inhibitors after curation, 162 Murcko scaffolds</Text>
+        <Text style={{ fontSize: 15, color: '#1A2230', marginTop: 6, lineHeight: 1.4 }}>unique FAP inhibitors after curation, 161 Murcko scaffolds</Text>
       </Box>
       <Box style={{ flex: 1, background: '#E8EFF8', padding: '16px 20px', flexDirection: 'column' }}>
         <Text style={{ fontSize: 34, fontWeight: 'bold', color: '#D9534F' }}>0.67 log</Text>
