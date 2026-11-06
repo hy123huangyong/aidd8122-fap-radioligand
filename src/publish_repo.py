@@ -166,9 +166,32 @@ def tracked_files() -> list[Path]:
     return files
 
 
+def bootstrap_empty_repo(owner: str, token: str) -> None:
+    """GitHub refuses git-blob writes on a repository with no refs at all.
+
+    A single PUT /contents/README.md creates the first commit and therefore
+    the object database.  Our real README replaces it in the next commit.
+    """
+    st, _ = api("GET", f"/repos/{owner}/{REPO}/git/ref/heads/main", token)
+    if st == 200:
+        return
+    seed = (b"# AIDD8122 Final Project\n\n"
+            b"Initializing the repository before the full source upload.\n")
+    st, resp = api("PUT", f"/repos/{owner}/{REPO}/contents/README.md", token, {
+        "message": "Initialize repository",
+        "content": base64.b64encode(seed).decode("ascii"),
+    })
+    if st not in (200, 201, 409, 422):
+        raise RuntimeError(f"Could not bootstrap the empty repository: {st} {resp}")
+    print("  bootstrapped     : empty repo now has an initial commit")
+
+
 def upload(owner: str, token: str) -> None:
+    st, ref = api("GET", f"/repos/{owner}/{REPO}/git/ref/heads/main", token)
+    head = ref.get("object", {}).get("sha") if st == 200 and isinstance(ref, dict) else None
     files = tracked_files()
-    print(f"  uploading        : {len(files)} tracked files via REST API")
+    print(f"  uploading        : {len(files)} tracked files via REST API"
+          + (" (on top of initial commit)" if head else ""))
     entries = []
     for i, f in enumerate(files, 1):
         rel = f.relative_to(ROOT).as_posix()
@@ -188,14 +211,18 @@ def upload(owner: str, token: str) -> None:
     status, commit = api("POST", f"/repos/{owner}/{REPO}/git/commits", token, {
         "message": "AIDD8122 final project: reproducible code, data, report and slides",
         "tree": tree["sha"],
-        "parents": [],
+        "parents": [head] if head else [],
     })
     if status not in (201, 200):
         raise RuntimeError(f"commit creation failed: {status} {commit}")
-    status, ref = api("POST", f"/repos/{owner}/{REPO}/git/refs", token,
-                      {"ref": "refs/heads/main", "sha": commit["sha"]})
+    if head:
+        status, ref = api("PATCH", f"/repos/{owner}/{REPO}/git/refs/heads/main",
+                          token, {"sha": commit["sha"]})
+    else:
+        status, ref = api("POST", f"/repos/{owner}/{REPO}/git/refs", token,
+                          {"ref": "refs/heads/main", "sha": commit["sha"]})
     if status not in (201, 200):
-        raise RuntimeError(f"ref creation failed: {status} {ref}")
+        raise RuntimeError(f"ref update failed: {status} {ref}")
     api("PATCH", f"/repos/{owner}/{REPO}", token, {"default_branch": "main"})
     print(f"  root commit      : {commit['sha'][:10]} on main")
 
@@ -249,10 +276,11 @@ def main() -> None:
         write_report_link(url)
     stage_and_commit(url)
     configure_remote(url)
-    status, _ = api("GET", f"/repos/{owner}/{REPO}/git/ref/heads/main", token)
+    status, _ = api("GET", f"/repos/{owner}/{REPO}/contents/repo_url.txt", token)
     if status == 200:
-        print("  main already has commits - skipping upload (idempotent)")
+        print("  submission already uploaded - skipping upload (idempotent)")
     else:
+        bootstrap_empty_repo(owner, token)
         upload(owner, token)
     verify(url, owner)
     if TOKEN_CACHE.exists():
