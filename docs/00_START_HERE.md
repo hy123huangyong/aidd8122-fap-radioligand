@@ -101,12 +101,10 @@ the exact files used, retrieved 3 November 2026.
 
 ## Code and data availability
 
-Appendix A of the report points to **the submitted project repository (folder
-`03_Code/` of this submission package)**, not an external GitHub URL. If the code
-is later published to GitHub, set the URL once in `src/09_build_report.py`
-(`REPO_PLACEHOLDER`) or via `repo_url.txt` / the `AIDD_REPO_URL` environment
-variable, then rebuild with `python src/09_build_report.py` and re-export the PDF
-with `src/build_report_pdf.ps1`.
+Appendix A of the report carries a clickable link to the public repository
+**https://github.com/hy123huangyong/aidd8122-fap-radioligand**.  The URL is stored in `repo_url.txt`; to change it, run
+`python src/20_set_repo_url.py <new-url>` (do not rebuild with
+`09_build_report.py`, which would discard post-build corrections).
 
 Local git history exists in the project root (`AIDD8122_Final_Project/.git`).
 `.gitignore` excludes caches, slide-building scratch state and this package
@@ -115,7 +113,7 @@ Local git history exists in the project root (`AIDD8122_Final_Project/.git`).
 ## Checklist before submission
 
 - [ ] Report PDF and presentation PDF are the two files the guidelines ask for
-- [ ] Appendix A points to the submitted project repository (no dangling external link)
+- [x] Appendix A links to the live public code repository: https://github.com/hy123huangyong/aidd8122-fap-radioligand
 - [ ] `03_Code/` contains `src/`, `requirements.txt`, `README.md`; `04_Results/tables/` holds every quoted number
 - [ ] `git status` is clean and the last commit matches the submitted PDF
 - [ ] Presentation rehearsed once at 10 minutes using the notes in `02_Presentation/`

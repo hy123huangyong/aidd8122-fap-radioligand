@@ -21,7 +21,7 @@ work. It does not.
 | Marking: Results (20%) | "tables and figures … baselines … strengths and limitations" | Tables 1–10, limitations §5.11, Appendices B/C. |
 | Marking: References (5%) | "cited consistently and appropriately … MPU project report format" | 29 references, all with verified DOIs. |
 | Presentation | "10-minute presentation, followed by a 5-minute Q&A" | 15-slide deck with 14:50 timed notes. |
-| Submission | "final report (PDF) and presentation slides (PDF) … link to an accessible GitHub repository" | **One open item — see below.** |
+| Submission | "final report (PDF) and presentation slides (PDF) … link to an accessible GitHub repository" | **Satisfied — https://github.com/hy123huangyong/aidd8122-fap-radioligand** |
 
 No clause requires inverse synthesis, retrosynthesis, pose prediction, MD or free
 energy. The plan's P1.1 (retrosynthesis) is therefore treated as a low-cost
@@ -53,10 +53,8 @@ energy. The plan's P1.1 (retrosynthesis) is therefore treated as a low-cost
    its 90% quantile over-covers (1.00) at more than double the interval width.
 5. All six top designs lack a chelator and five use a non-clinical warhead.
 
-### One open item before submission
+### Repository link — resolved
 
-The brief requires a link to an accessible GitHub repository. Appendix A currently
-points to the submitted `03_Code/` evidence bundle (no dangling placeholder URL).
-Once the repository exists, write its URL to `repo_url.txt` in the project root
-(or set `AIDD_REPO_URL`), then rebuild with `python src/09_build_report.py` and
-re-export the PDF. No other text needs editing.
+The public repository is https://github.com/hy123huangyong/aidd8122-fap-radioligand . Appendix A carries the clickable URL;
+`repo_url.txt` stores it for reproducibility. The `03_Code/` evidence bundle in the
+submission package mirrors the same source tree.
