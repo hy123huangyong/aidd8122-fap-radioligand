@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Put the live public GitHub URL into the final report and refresh deliverables.
+"""Put the live public repository URL into the final report and refresh deliverables.
 
 Run from the project root, after the repository has been created and pushed::
 
     <venv>/Scripts/python.exe src/20_set_repo_url.py https://github.com/USER/REPO
+
+A GitHub URL is what the brief asks for.  Any other public https URL (a Gitee
+mirror, a university-hosted code archive, a published static mirror) is also
+accepted so that submission is not blocked if GitHub signup is unavailable;
+the script prints a warning in that case.  Re-run it with the GitHub URL later
+to swap the link -- the replacement is idempotent.
 
 IMPORTANT
 ---------
@@ -44,10 +50,18 @@ PLACEHOLDER = ("the submitted project repository "
 
 def check(url: str) -> str:
     url = url.strip().rstrip("/")
-    if not re.fullmatch(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", url):
+    if not re.fullmatch(r"https://[A-Za-z0-9.-]+(?::\d+)?/[^\s?#]+", url):
         raise SystemExit(
-            "URL must look like https://github.com/USER/REPO "
-            "(https, no trailing slash, no query string).")
+            "URL must be a plain https:// link (no spaces, no query string, "
+            "no trailing slash).")
+    host = url.split("/")[2].lower()
+    if host == "github.com" or host.endswith(".github.com"):
+        if not re.fullmatch(r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", url):
+            raise SystemExit("GitHub URL must look like https://github.com/USER/REPO")
+    else:
+        print("  ! NOTE: the brief asks for an accessible GitHub repository.")
+        print("    This URL is not on github.com -- swap it with the same command")
+        print("    as soon as GitHub signup is possible.")
     return url
 
 
@@ -113,6 +127,7 @@ def _hyperlink(par, url: str, rid: str) -> None:
 def patch_docx(url: str) -> None:
     from docx import Document
     from docx.opc.constants import RELATIONSHIP_TYPE as RT
+    from docx.oxml.ns import qn
     from docx.shared import Pt
 
     doc = Document(DOCX)
@@ -138,6 +153,17 @@ def patch_docx(url: str) -> None:
     _box(target)
     target.paragraph_format.space_before = Pt(10)
     target.paragraph_format.space_after = Pt(6)
+
+    # Drop orphaned hyperlink relationships left behind when the URL is swapped
+    # (e.g. a temporary mirror replaced by the final GitHub link).
+    used = {h.get(qn("r:id")) for h in doc.element.body.findall(".//" + qn("w:hyperlink"))}
+    rels = doc.part.rels
+    for rid, rel in list(rels.items()):
+        if rel.reltype == RT.HYPERLINK and rid not in used:
+            try:
+                del rels[rid]
+            except (TypeError, KeyError):
+                rels._rels.pop(rid, None)
     doc.save(DOCX)
     print(f"  + docx  : {DOCX.name} -> {url}")
 
@@ -176,7 +202,7 @@ def export_pdf() -> None:
 
 
 # ----------------------------------------------------------------- docs + pack
-def patch_docs(url: str) -> None:
+def patch_docs(url: str, previous: str | None = None) -> None:
     edits = {
         ROOT / "docs" / "00_START_HERE.md": [
             ("Appendix A of the report points to **the submitted project repository (folder\n"
@@ -190,7 +216,7 @@ def patch_docs(url: str) -> None:
              f"`python src/20_set_repo_url.py <new-url>` (do not rebuild with\n"
              f"`09_build_report.py`, which would discard post-build corrections)."),
             ("- [ ] Appendix A points to the submitted project repository (no dangling external link)",
-             f"- [x] Appendix A links to the live public GitHub repository: {url}"),
+             f"- [x] Appendix A links to the live public code repository: {url}"),
         ],
         ROOT / "docs" / "ROUTE_DECISION.md": [
             ("| Submission | \"final report (PDF) and presentation slides (PDF) … link to an accessible GitHub repository\" | **One open item — see below.** |",
@@ -211,10 +237,14 @@ def patch_docs(url: str) -> None:
         if not path.exists():
             continue
         text = path.read_text(encoding="utf-8")
+        # Re-running with a new URL (e.g. Gitee fallback -> GitHub): the legacy
+        # placeholder text is already gone, so update the old URL in place.
+        if previous and previous != url:
+            text = text.replace(previous, url)
         for old, new in pairs:
             if old in text:
                 text = text.replace(old, new)
-            else:
+            elif not previous:
                 print(f"  ! doc pattern not found in {path.name}: {old[:48]}...")
         path.write_text(text, encoding="utf-8")
         print(f"  + docs  : {path.name}")
@@ -229,11 +259,13 @@ def main() -> None:
     if len(sys.argv) != 2:
         raise SystemExit(__doc__)
     url = check(sys.argv[1])
-    (ROOT / "repo_url.txt").write_text(url + "\n", encoding="utf-8")
+    cfg = ROOT / "repo_url.txt"
+    previous = cfg.read_text(encoding="utf-8").strip() if cfg.exists() else None
+    cfg.write_text(url + "\n", encoding="utf-8")
     print(f"  + config: repo_url.txt -> {url}")
     patch_docx(url)
     export_pdf()
-    patch_docs(url)
+    patch_docs(url, previous)
     repack()
     print("\nDone. Verify the Appendix A link opens the public repository before submitting.")
 
