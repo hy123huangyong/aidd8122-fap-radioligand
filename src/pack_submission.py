@@ -51,10 +51,9 @@ LAYOUT = {
 def copy_files() -> list[str]:
     copied = []
 
-    # package-level indices and the route-decision record
+    # package-level indices (final deliverables only)
     for name, dest in (("00_START_HERE.md", "00_START_HERE.md"),
-                       ("FIGURE_INDEX.md", "04_Results/FIGURE_INDEX.md"),
-                       ("ROUTE_DECISION.md", "ROUTE_DECISION.md")):
+                       ("FIGURE_INDEX.md", "04_Results/FIGURE_INDEX.md")):
         index = ROOT / "docs" / name
         if index.exists():
             target = PKG / dest
@@ -75,7 +74,10 @@ def copy_files() -> list[str]:
     # numbered source code
     src_dir = PKG / "03_Code" / "src"
     src_dir.mkdir(parents=True, exist_ok=True)
+    publishing_helpers = {"authorize_device.py", "publish_repo.py"}
     for py in sorted((ROOT / "src").glob("*.py")):
+        if py.name in publishing_helpers:
+            continue
         shutil.copy2(py, src_dir / py.name)
         copied.append(f"03_Code/src/{py.name}")
 

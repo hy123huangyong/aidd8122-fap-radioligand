@@ -1,8 +1,7 @@
 """
-Route-A optimisation pass for 09_build_report.py (see
-AIDD8122_R报告优化方案_20261105.md, sections 4-6 and 8).
+Final consistency patch for 09_build_report.py.
 
-Applies the P0/P1 textual changes as verified, single-match replacements.
+Applies the textual corrections as verified, single-match replacements.
 Every patch asserts that its anchor occurs exactly once, so a later edit to the
 report builder cannot silently drop a fix.  Re-running this script is a no-op
 once the patches are in place (it detects the already-patched state).

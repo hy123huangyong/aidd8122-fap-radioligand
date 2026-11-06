@@ -36,3 +36,15 @@ _chk/
 GITHUB_AUTH_CODE.txt
 results/figures_bak/
 results/tables/_bak_*.csv
+
+# internal review drafts, superseded deck versions and one-off publishing helpers
+# (kept on disk locally, deliberately not part of the public source tree)
+AIDD8122_R报告优化方案_20261105.md
+AIDD8122_v2提交前评估_20261105.md
+docs/V2_CORRECTIONS.md
+docs/ROUTE_DECISION.md
+AIDD8122_Final_Presentation_HuangYong/*_15min.pptx
+AIDD8122_Final_Presentation_HuangYong/*_15min.pdf
+AIDD8122_Final_Presentation_HuangYong/slides/
+src/authorize_device.py
+src/publish_repo.py

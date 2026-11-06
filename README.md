@@ -31,8 +31,11 @@ src/
   15_patch_report.py     consistency pass over the report text (idempotent)
   16_evidence_bundle.py  writes logs/ (environment fingerprint, manifest, reconciliation log)
   17_restore_images.py   restores full-resolution figures after Word saves the .docx
-  fix_slides_text.py     applies the final text corrections to the 15-minute deck
+  fix_slides_text.py     applies the final text corrections to the presentation deck
   fix_notes_placeholder.py  rebuilds the speaker notes as proper notes placeholders
+  18_make_10min_deck.py  trims the deck to the required 10-minute, 14-slide format
+  19_restyle_deck.py     applies the final typography and layout to the deck
+  20_set_repo_url.py     refreshes the repository link in the report and package
   pack_submission.py     assembles Submission_HuangYong_P2600222/ and its .zip
   aidd_utils.py          featurisation, splits, metrics, plotting style
 data/raw/                ChEMBL records as retrieved (JSON)
@@ -40,6 +43,9 @@ data/processed/          curated per-target tables (CSV)
 results/tables/          every number reported in the document (CSV/JSON)
 results/figures/         every figure in the document (PNG)
 report/                  final report (.docx / .pdf)
+AIDD8122_Final_Presentation_HuangYong/  final 10-minute deck (.pptx / .pdf) and its figures
+docs/                    reproduction notes and the figure-to-script index
+repo_url.txt             the public repository URL quoted in Appendix A
 ```
 
 ## Reproduction
@@ -59,10 +65,12 @@ python src/11_reference_dois.py && python src/12_design_feasibility.py && python
 
 The PDF is then produced by `src/build_report_pdf.ps1`, which inserts the Word
 table-of-contents field, exports the PDF and restores the full-resolution figures
-that Word downsamples on save. `src/14`–`src/17`, the two `fix_*` deck
-utilities and `pack_submission.py` are
-build/report utilities rather than analysis steps; they are documented in
-`docs/00_START_HERE.md`.
+that Word downsamples on save. `src/14`–`src/17`, the `fix_*` deck utilities,
+`src/18`–`src/20` and `pack_submission.py` are delivery-format utilities rather
+than analysis steps; `18` and `19` were one-off deck re-layouts whose input was a
+working draft kept outside the repository. Only the final 10-minute deck and the
+v2 report are shipped — earlier drafts are deliberately not part of the source
+tree. See `docs/00_START_HERE.md` for the submission-package layout.
 
 ## Headline results
 

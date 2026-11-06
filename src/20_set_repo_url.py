@@ -218,20 +218,6 @@ def patch_docs(url: str, previous: str | None = None) -> None:
             ("- [ ] Appendix A points to the submitted project repository (no dangling external link)",
              f"- [x] Appendix A links to the live public code repository: {url}"),
         ],
-        ROOT / "docs" / "ROUTE_DECISION.md": [
-            ("| Submission | \"final report (PDF) and presentation slides (PDF) … link to an accessible GitHub repository\" | **One open item — see below.** |",
-             f"| Submission | \"final report (PDF) and presentation slides (PDF) … link to an accessible GitHub repository\" | **Satisfied — {url}** |"),
-            ("### One open item before submission\n\n"
-             "The brief requires a link to an accessible GitHub repository. Appendix A currently\n"
-             "points to the submitted `03_Code/` evidence bundle (no dangling placeholder URL).\n"
-             "Once the repository exists, write its URL to `repo_url.txt` in the project root\n"
-             "(or set `AIDD_REPO_URL`), then rebuild with `python src/09_build_report.py` and\n"
-             "re-export the PDF. No other text needs editing.",
-             f"### Repository link — resolved\n\n"
-             f"The public repository is {url} . Appendix A carries the clickable URL;\n"
-             f"`repo_url.txt` stores it for reproducibility. The `03_Code/` evidence bundle in the\n"
-             f"submission package mirrors the same source tree."),
-        ],
     }
     for path, pairs in edits.items():
         if not path.exists():

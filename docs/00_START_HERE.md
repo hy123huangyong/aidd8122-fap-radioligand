@@ -15,9 +15,12 @@ Multi-Objective Generative Design of FAP-Selective Radioligand Warheads
 
 ## What is in this folder
 
+This index describes the **submission package**. In the public GitHub repository
+the identical material is laid out as `src/`, `data/`, `results/`, `report/` and
+`AIDD8122_Final_Presentation_HuangYong/`; `README.md` there documents that view.
+
 ```
 00_START_HERE.md                 this file
-ROUTE_DECISION.md                why the project is ligand-based (no docking / no structure work)
 
 01_Report/
     AIDD8122_Final_Report_HuangYong_P2600222_v2.pdf     report, 30 pages, live TOC (submission copy)
