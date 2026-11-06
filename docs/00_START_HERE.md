@@ -24,9 +24,9 @@ ROUTE_DECISION.md                why the project is ligand-based (no docking / n
     AIDD8122_Final_Report_HuangYong_P2600222_v2.docx    editable source, real Word TOC field
 
 02_Presentation/
-    AIDD8122_Final_Presentation_HuangYong_15min.pdf     15 slides (submission copy)
-    AIDD8122_Final_Presentation_HuangYong_15min.pptx    editable source, timed speaker notes
-    Speaker_Notes_15min.md                              printable script, ~14 min 50 s
+    AIDD8122_Final_Presentation_HuangYong_10min.pdf     14 slides, timed to 10:00 (submission copy)
+    AIDD8122_Final_Presentation_HuangYong_10min.pptx    editable source, timed speaker notes
+    Speaker_Notes_10min.md                              printable script, 10 min 00 s
 
 03_Code/
     README.md                 one-command reproduction + table-to-script map
@@ -118,5 +118,5 @@ Local git history exists in the project root (`AIDD8122_Final_Project/.git`).
 - [ ] Appendix A points to the submitted project repository (no dangling external link)
 - [ ] `03_Code/` contains `src/`, `requirements.txt`, `README.md`; `04_Results/tables/` holds every quoted number
 - [ ] `git status` is clean and the last commit matches the submitted PDF
-- [ ] Presentation rehearsed once at 15 minutes using the notes in `02_Presentation/`
+- [ ] Presentation rehearsed once at 10 minutes using the notes in `02_Presentation/`
 - [ ] Group 2 slot: 24 November 2026

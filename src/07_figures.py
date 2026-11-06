@@ -10,6 +10,9 @@ without refitting anything.
 """
 from __future__ import annotations
 
+import matplotlib
+import matplotlib.transforms
+
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -49,8 +52,8 @@ def fig_benchmark() -> None:
     ax.set_xticklabels([SPLIT_LABEL[s] for s in splits])
     ax.set_ylabel("RMSE (log units)")
     ax.set_ylim(0, 2.75)
-    ax.legend(ncol=3, loc="upper left", fontsize=6.6, columnspacing=0.9, handlelength=1.1,
-              handletextpad=0.4)
+    ax.legend(ncol=5, loc="upper center", bbox_to_anchor=(0.5, -0.20), fontsize=6.2,
+              columnspacing=0.8, handlelength=0.9, handletextpad=0.3, borderaxespad=0)
     ax.set_title("a  Accuracy by split protocol", loc="left")
 
     # ---- b  calibration of the best model
@@ -66,7 +69,9 @@ def fig_benchmark() -> None:
     ax.set_ylabel("predicted pActivity")
     ax.set_xlim(3.8, 10.2)
     ax.set_ylim(3.4, 10.4)
-    ax.legend(loc="upper left", fontsize=7)
+    ax.legend(loc="upper left", fontsize=6.0, handlelength=1.0, handletextpad=0.25,
+              borderpad=0.2, frameon=True, facecolor="white", edgecolor="none",
+              framealpha=1.0)
     ax.set_title("b  XGBoost calibration", loc="left")
 
     # ---- c  early enrichment
@@ -82,16 +87,18 @@ def fig_benchmark() -> None:
         ax.bar(xs, ys, 0.17, yerr=es, capsize=1.6, color=MODEL_COLOR[model],
                label=MODEL_LABEL[model], error_kw={"lw": 0.7, "elinewidth": 0.7})
     ax.axhline(1.0, ls="--", c="k", lw=0.8)
-    ax.text(2.45, 1.06, "no enrichment", fontsize=6.6, ha="right")
+    ax.text(0.015, 1.10, "no enrichment", fontsize=6.2, ha="left", va="bottom",
+            transform=matplotlib.transforms.blended_transform_factory(ax.transAxes, ax.transData),
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.8})
     ax.set_xticks(np.arange(len(splits)))
     ax.set_xticklabels([SPLIT_LABEL[s] for s in splits])
     ax.set_ylabel("EF$_{10}$")
     ax.set_ylim(0, 2.65)
-    ax.legend(ncol=2, loc="upper right", fontsize=6.6, handlelength=1.1,
-              handletextpad=0.4, columnspacing=0.8)
+    ax.legend(ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.20), fontsize=6.2,
+              handlelength=0.9, handletextpad=0.3, columnspacing=0.7, borderaxespad=0)
     ax.set_title("c  Early enrichment", loc="left")
 
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
     fig.savefig(U.FIG / "fig2_benchmark.png")
     plt.close(fig)
 
@@ -158,13 +165,18 @@ def fig_transfer_selectivity() -> None:
     ax.hist(d2.pchembl - d2.pchembl_o, bins=bins, histtype="step", lw=1.3,
             color=U.PALETTE["DPP4"], density=True, label=f"vs DPP4 (n={len(d2)})")
     ax.axvline(1.0, ls=":", c="k", lw=0.9)
-    ax.text(1.12, 0.06, "10-fold\nselective", fontsize=6.6, transform=ax.get_xaxis_transform())
+    ax.set_ylim(0, 0.58)
+    ax.text(1.06, 0.99, "10-fold selective", fontsize=6.2, ha="left", va="top",
+            transform=ax.get_xaxis_transform(),
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 0.8})
     ax.set_xlabel("$\\Delta$pActivity (FAP - paralogue)")
     ax.set_ylabel("density")
-    ax.legend(loc="upper left", fontsize=7)
+    ax.legend(loc="upper left", fontsize=6.0, handlelength=1.0, handletextpad=0.25,
+              borderpad=0.2, frameon=True, facecolor="white", edgecolor="none",
+              framealpha=1.0)
     ax.set_title("c  Selectivity margin", loc="left")
 
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
     fig.savefig(U.FIG / "fig3_transfer_selectivity.png")
     plt.close(fig)
 

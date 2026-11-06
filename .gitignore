@@ -29,3 +29,9 @@ report/_chk_*.png
 Submission_HuangYong_P2600222.zip
 report/_archive_v1/
 AIDD8122_Final_Project-P2600222-HuangYong.docx
+
+# local review scratch, backups and workspace metadata (never publish)
+_chk/
+.workbuddy/
+results/figures_bak/
+results/tables/_bak_*.csv

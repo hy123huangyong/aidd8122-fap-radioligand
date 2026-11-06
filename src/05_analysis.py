@@ -46,7 +46,8 @@ def fig_dataset(fap: pd.DataFrame, prep: pd.DataFrame, dpp4: pd.DataFrame) -> No
     ax.text(7.08, ax.get_ylim()[1] * 0.03, "100 nM", fontsize=7, rotation=90)
     ax.set_xlabel("pActivity (-log$_{10}$ M)")
     ax.set_ylabel("density")
-    ax.legend(loc="upper right", fontsize=6.8, handlelength=1.4)
+    ax.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.22), fontsize=6.2,
+              handlelength=1.2, handletextpad=0.3, columnspacing=0.8, borderaxespad=0)
     ax.set_title("a  Potency coverage", loc="left")
 
     ax = axes[1]
@@ -70,7 +71,7 @@ def fig_dataset(fap: pd.DataFrame, prep: pd.DataFrame, dpp4: pd.DataFrame) -> No
     ax.set_ylabel("unique Murcko scaffolds")
     ax.set_ylim(0, max(counts) * 1.42)
     ax.set_title("c  Scaffold diversity", loc="left")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
     fig.savefig(U.FIG / "fig1_dataset.png")
     plt.close(fig)
 
@@ -143,7 +144,7 @@ def ad_and_conformal(fap: pd.DataFrame, seeds: int = 5) -> None:
     print(conf.groupby(["protocol", "level"])[["coverage", "width"]].mean().round(2).to_string())
 
     # figure: error vs similarity + coverage/error trade-off
-    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0))
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.6))
     ax = axes[0]
     ax.scatter(ad.sim, ad.abs_err, s=13, alpha=0.45, c=U.PALETTE["FAP"], linewidths=0)
     med = ad.groupby("bin", observed=True).abs_err.median()
@@ -153,7 +154,8 @@ def ad_and_conformal(fap: pd.DataFrame, seeds: int = 5) -> None:
     ax.text(0.34, 0.56, "0.5 log unit", fontsize=7)
     ax.set_xlabel("max Tanimoto similarity to the training set")
     ax.set_ylabel("|predicted - measured| (log units)")
-    ax.legend(loc="upper left", fontsize=7)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.42), fontsize=6.4,
+              handlelength=1.4, handletextpad=0.3, borderaxespad=0)
     ax.set_title("a  Applicability domain", loc="left")
 
     ax = axes[1]
@@ -165,14 +167,15 @@ def ad_and_conformal(fap: pd.DataFrame, seeds: int = 5) -> None:
                   width=0.55)
     overall = float(np.sqrt((ad.abs_err ** 2).mean()))
     ax.axhline(overall, ls="--", c="k", lw=0.8)
-    ax.text(2.42, overall + 0.02, "overall", fontsize=7, ha="right")
+    ax.text(-0.42, overall + 0.03, "overall", fontsize=6.8, ha="left",
+            bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.0})
     for b_, n_ in zip(bars, n_b):
         ax.text(b_.get_x() + b_.get_width() / 2, b_.get_height() + 0.02,
                 f"n={n_}", ha="center", fontsize=7)
     ax.set_ylabel("RMSE (log units)")
     ax.set_ylim(0, max(rmse_b) * 1.25)
     ax.set_title("b  Error by applicability class", loc="left")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.20, 1, 1))
     fig.savefig(U.FIG / "fig4_applicability_domain.png")
     plt.close(fig)
 
@@ -199,7 +202,7 @@ def temporal(fap: pd.DataFrame) -> None:
     ]).to_csv(U.TAB / "temporal.csv", index=False)
 
     # figure
-    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.0))
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.6))
     ax = axes[0]
     rnd_tr, rnd_te = U.random_split(y, 0.2, 0)
     m2 = xgb(0)
@@ -210,7 +213,8 @@ def temporal(fap: pd.DataFrame) -> None:
     ax.plot([4, 10], [4, 10], "k--", lw=0.8)
     ax.set_xlabel("measured pActivity")
     ax.set_ylabel("predicted pActivity")
-    ax.legend(loc="upper left", fontsize=7)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.42), fontsize=6.4,
+              handlelength=1.4, handletextpad=0.3, borderaxespad=0)
     ax.set_title("a  Interpolation", loc="left")
 
     ax = axes[1]
@@ -221,9 +225,10 @@ def temporal(fap: pd.DataFrame) -> None:
     ax.plot([4, 10], [4, 10], "k--", lw=0.8)
     ax.set_xlabel("measured pActivity")
     ax.set_ylabel("predicted pActivity")
-    ax.legend(loc="upper left", fontsize=7)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.42), fontsize=6.4,
+              handlelength=1.4, handletextpad=0.3, borderaxespad=0)
     ax.set_title("b  Extrapolation to a new era", loc="left")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.20, 1, 1))
     fig.savefig(U.FIG / "fig5_temporal_drift.png")
     plt.close(fig)
 
@@ -233,7 +238,7 @@ def generative() -> None:
     traj = pd.read_csv(U.TAB / "generative_trajectory.csv")
     arc = pd.read_csv(U.TAB / "generative_archive.csv")
 
-    fig, axes = plt.subplots(1, 3, figsize=(9.4, 2.8))
+    fig, axes = plt.subplots(1, 3, figsize=(9.4, 3.6))
 
     # a  population fitness under the three regimes
     ax = axes[0]
@@ -243,9 +248,10 @@ def generative() -> None:
         d = traj[traj["mode"] == mode]
         ax.plot(d.generation, d.median_pFAP, lw=1.4, color=col, label=lab)
     ax.set_xlabel("generation")
-    ax.set_ylabel("median pFAP of the breeding population")
+    ax.set_ylabel("median pFAP of population")
     ax.set_ylim(6.0, 9.3)
-    ax.legend(loc="lower left", fontsize=7)
+    ax.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.40), fontsize=6.0,
+              handlelength=1.0, handletextpad=0.25, columnspacing=0.7, borderaxespad=0)
     ax.set_title("a  Selection pressure", loc="left")
 
     # b  predicted affinity vs selectivity margin
@@ -261,7 +267,8 @@ def generative() -> None:
     ax.set_ylim(-2.4, 4.4)
     ax.set_xlabel("predicted pFAP")
     ax.set_ylabel("predicted margin (pFAP $-$ max paralogue)")
-    ax.legend(loc="lower right", fontsize=6.8, framealpha=0.9, handletextpad=0.4)
+    ax.legend(ncol=3, loc="upper center", bbox_to_anchor=(0.5, -0.40), fontsize=6.0,
+              handlelength=1.0, handletextpad=0.25, columnspacing=0.7, borderaxespad=0)
     ax.set_title("b  Archived molecules", loc="left")
 
     # c  drug-likeness pays for single-objective greed
@@ -282,7 +289,7 @@ def generative() -> None:
     ax.set_ylabel("QED (drug-likeness)")
     ax.set_title("c  Developability", loc="left")
 
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0.20, 1, 1))
     fig.savefig(U.FIG / "fig7_generative.png")
     plt.close(fig)
 

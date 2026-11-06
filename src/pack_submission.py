@@ -25,7 +25,7 @@ PKG = ROOT / "Submission_HuangYong_P2600222"
 
 REPORT = ROOT / "report"
 DECK = ROOT / "AIDD8122_Final_Presentation_HuangYong"
-DECK_STEM = "AIDD8122_Final_Presentation_HuangYong_15min"
+DECK_STEM = "AIDD8122_Final_Presentation_HuangYong_10min"
 REPORT_STEM = "AIDD8122_Final_Report_HuangYong_P2600222_v2"
 
 LAYOUT = {
@@ -118,7 +118,7 @@ def export_notes() -> None:
     if not deck.exists():
         return
     prs = Presentation(deck)
-    lines = ["# AIDD8122 汇报讲稿（15 分钟节奏）\n",
+    lines = ["# AIDD8122 汇报讲稿（10 分钟节奏）\n",
              "Huang Yong · P2600222 · Group 2 · 24 November 2026\n",
              "每页备注已同步写入 .pptx 的演讲者备注栏；本文件便于打印。\n"]
     for i, slide in enumerate(prs.slides, 1):
@@ -128,7 +128,7 @@ def export_notes() -> None:
                 text = shp.text_frame.text.strip()
                 break
         lines.append(f"\n---\n\n## {i:02d}\n\n```\n{text}\n```\n")
-    out = PKG / "02_Presentation" / "Speaker_Notes_15min.md"
+    out = PKG / "02_Presentation" / "Speaker_Notes_10min.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(lines), encoding="utf-8")
     print(f"  + 02_Presentation/{out.name}")
