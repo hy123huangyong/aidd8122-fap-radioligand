@@ -16,21 +16,21 @@ A GitHub OAuth token (from the device-code flow) or a classic PAT with
 The token is never written to the repository, to ``.git/config``, or to any
 log line.  Delete the temp file after publishing (the script does it for you).
 
-Why not ``git push``
---------------------
-The campus transparent proxy intermittently answers
-"CONNECT tunnel failed, response 502" for ``github.com`` git endpoints, while
-``api.github.com`` is consistently reachable.  All writes here therefore use
-the REST API (blob -> tree -> commit -> ref), which needs no git transport.
-The local commit is still created so the working tree stays reproducible, and
-the remote is recorded for normal use once the network behaves.
+Transport
+---------
+A single ``git push`` of the local history is attempted first (one packfile,
+by far the fastest).  The campus transparent proxy intermittently answers
+"CONNECT tunnel failed, response 502" for ``github.com`` git endpoints, so if
+that fails the script falls back to the REST API on ``api.github.com``
+(blob -> tree -> commit -> ref), which is slower but needs no git transport.
+The local commit is created either way, so the working tree stays reproducible.
 
 Sequence
 --------
 1. Resolve the authenticated user; create the empty Public repo if absent.
 2. Run ``20_set_repo_url.py`` so the delivered report carries the live link.
 3. Commit the resulting changes locally.
-4. Upload every tracked file via the REST API as one root commit on ``main``.
+4. Push the local history to ``main`` (REST API fallback if git is blocked).
 5. Verify anonymously that the repo and its key paths are readable.
 """
 from __future__ import annotations
@@ -237,6 +237,32 @@ def configure_remote(url: str) -> None:
     print(f"  remote origin    : {url}.git")
 
 
+def push_via_git(token: str) -> bool:
+    """Preferred transport: one packfile instead of one HTTP POST per file.
+
+    ``--force`` is required only because an empty repository is bootstrapped
+    with a throwaway README commit whose history we deliberately replace.
+    It is safe on a freshly created personal repository with no collaborators.
+    """
+    auth = base64.b64encode(f"x-access-token:{token}".encode()).decode("ascii")
+    env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
+    cmd = ["git",
+           "-c", "credential.helper=",
+           "-c", "http.version=HTTP/1.1",
+           "-c", f"http.extraHeader=Authorization: Basic {auth}",
+           "-c", "http.postBuffer=524288000",
+           "push", "-u", "--force", "origin", "main"]
+    for attempt in range(3):
+        p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, env=env)
+        if p.returncode == 0:
+            print("  git push         : OK")
+            return True
+        print(f"  git push attempt {attempt + 1} failed: "
+              f"{p.stderr.strip()[:120]}", flush=True)
+        time.sleep(5)
+    return False
+
+
 def verify(url: str, owner: str) -> None:
     status, info = api("GET", f"/repos/{owner}/{REPO}")          # anonymous
     ok_repo = status == 200 and isinstance(info, dict) and not info.get("private")
@@ -276,12 +302,14 @@ def main() -> None:
         write_report_link(url)
     stage_and_commit(url)
     configure_remote(url)
-    status, _ = api("GET", f"/repos/{owner}/{REPO}/contents/repo_url.txt", token)
-    if status == 200:
-        print("  submission already uploaded - skipping upload (idempotent)")
-    else:
-        bootstrap_empty_repo(owner, token)
-        upload(owner, token)
+    if not push_via_git(token):
+        print("  git transport blocked - falling back to REST upload (slow)")
+        status, _ = api("GET", f"/repos/{owner}/{REPO}/contents/repo_url.txt", token)
+        if status == 200:
+            print("  submission already uploaded - skipping upload (idempotent)")
+        else:
+            bootstrap_empty_repo(owner, token)
+            upload(owner, token)
     verify(url, owner)
     if TOKEN_CACHE.exists():
         TOKEN_CACHE.unlink()
