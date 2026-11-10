@@ -36,6 +36,7 @@ src/
   18_make_10min_deck.py  trims the deck to the required 10-minute, 14-slide format
   19_restyle_deck.py     applies the final typography and layout to the deck
   20_set_repo_url.py     refreshes the repository link in the report and package
+  21_polish_layout.py    final report typography: first-line indents, TOC fit (--pdf re-exports)
   pack_submission.py     assembles Submission_HuangYong_P2600222/ and its .zip
   aidd_utils.py          featurisation, splits, metrics, plotting style
 data/raw/                ChEMBL records as retrieved (JSON)
@@ -66,11 +67,15 @@ python src/11_reference_dois.py && python src/12_design_feasibility.py && python
 The PDF is then produced by `src/build_report_pdf.ps1`, which inserts the Word
 table-of-contents field, exports the PDF and restores the full-resolution figures
 that Word downsamples on save. `src/14`–`src/17`, the `fix_*` deck utilities,
-`src/18`–`src/20` and `pack_submission.py` are delivery-format utilities rather
+`src/18`–`src/21` and `pack_submission.py` are delivery-format utilities rather
 than analysis steps; `18` and `19` were one-off deck re-layouts whose input was a
-working draft kept outside the repository. Only the final 10-minute deck and the
-v2 report are shipped — earlier drafts are deliberately not part of the source
-tree. See `docs/00_START_HERE.md` for the submission-package layout.
+working draft kept outside the repository. `src/21_polish_layout.py` is the last
+step of the report chain: it applies the two-character first-line indent to prose
+paragraphs, tightens the paragraph gap, keeps the table of contents on one page
+and exports the final PDF. It is idempotent and does not alter any number,
+figure, caption or reference. Only the final 10-minute deck and the v2 report are
+shipped — earlier drafts are deliberately not part of the source tree.
+See `docs/00_START_HERE.md` for the submission-package layout.
 
 ## Headline results
 
