@@ -32,7 +32,7 @@ TITLE = ("Trust Before Throughput: Benchmarking, Uncertainty-Aware Screening and
          "Multi-Objective Generative Design of FAP-Selective Radioligand Warheads")
 STUDENT = "Huang Yong"
 SID = "P2600222"
-DATE = "16/11/2026"
+DATE = "12/11/2026"
 
 BODY_FONT = "Times New Roman"
 

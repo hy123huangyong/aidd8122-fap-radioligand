@@ -234,7 +234,7 @@ def s01(prs, blank):
     txt(s, 0.62, 5.20, 5.60, 0.32, "HUANG Yong   (P2600222)", 15, INK)
     txt(s, 0.62, 5.58, 5.60, 0.32, "Group 2  ·  AIDD8122 Final Project", 13, MUTED)
     rect(s, 0.64, 6.06, 4.60, 0.012, RULE)
-    txt(s, 0.62, 6.20, 6.40, 0.30, "16 November 2026", 12.5, GREY)
+    txt(s, 0.62, 6.20, 6.40, 0.30, "12 November 2026", 12.5, GREY)
     txt(s, 0.62, 6.62, 8.40, 0.26,
         "Prepared for AIDD8122 · Advanced Topics in Artificial Intelligence & Drug Discovery",
         10.5, GREY)
@@ -583,7 +583,7 @@ def s14(prs, blank):
         34, WHITE, True)
     rect(s, 0.92, 3.88, 1.60, 0.03, TEAL)
     txt(s, 0.92, 4.14, 11.50, 0.30,
-        "HUANG Yong (P2600222)   ·   AIDD8122 Final Project   ·   16 November 2026",
+        "HUANG Yong (P2600222)   ·   AIDD8122 Final Project   ·   12 November 2026",
         12, PALEBLUE)
     txt(s, 0.92, 4.60, 11.50, 0.55,
         "Trust before throughput: the useful output of a model on a small, drifting target is a calibrated\n"

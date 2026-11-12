@@ -133,7 +133,7 @@ def export_notes() -> None:
              for s in prs.slides]
     total = sum(len(p) for p in pages)          # count follows the deck, not a constant
     lines = ["# AIDD8122 汇报讲稿（大白话版）\n",
-             "Huang Yong · P2600222 · Group 2 · 16 November 2026\n",
+             "Huang Yong · P2600222 · Group 2 · 12 November 2026\n",
              "每页都是能直接照着念的白话，已经同步写进 .pptx 的演讲者备注栏；这份是打印用的。\n",
              f"全篇约 {round(total, -2):.0f} 字，正常语速十分钟。时间紧就每页只念开头一两句和最后结论，\n",
              "中间的数字解释留给自己看懂就行。开讲前先翻最后的「提问环节可能问到」。\n"]

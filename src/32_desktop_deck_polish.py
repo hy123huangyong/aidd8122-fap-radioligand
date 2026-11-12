@@ -146,13 +146,16 @@ def apply(prs) -> list[str]:
 
 
 def cover_date(prs) -> str:
+    """Normalise the cover date to the day the report was last edited."""
     slide = prs.slides[0]
     for sh in slide.shapes:
         if sh.has_text_frame and "November 2026" in sh.text_frame.text:
             para = sh.text_frame.paragraphs[0]
             before = para.text
             if para.runs:
-                para.runs[0].text = "16"
+                para.runs[0].text = "12 November 2026"
+                for extra in para.runs[1:]:
+                    extra.text = ""
             return f"cover date: {before!r} -> {para.text!r}"
     raise AssertionError("cover date not found")
 
@@ -161,7 +164,7 @@ def check(prs) -> None:
     texts = ["\n".join(sh.text_frame.text for sh in s.shapes if sh.has_text_frame)
              for s in prs.slides]
     assert "24 November 2026" not in texts[0], "cover still shows 24 November"
-    assert "16 November 2026" in texts[0], "cover date not updated"
+    assert "12 November 2026" in texts[0], "cover date not updated"
     assert "what I would do next" not in texts[1], "outline still promises next steps"
     assert "temporal drift" not in texts[1], "outline still promises a drift slide"
     assert "Fibroblast activation protein (FAP)" in texts[2], "FAP full name missing"

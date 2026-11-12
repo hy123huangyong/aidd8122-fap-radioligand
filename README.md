@@ -52,7 +52,7 @@ src/
   pack_submission.py     assembles the submission package and its .zip
 ```
 
-Delivery utilities (`14`–`34`, `pack_submission.py`) are formatting passes, not
+Delivery utilities (`14`–`35`, `pack_submission.py`) are formatting passes, not
 analysis steps. `18`–`19` were one-off re-layouts of a working draft.
 
 ## Reproduction
