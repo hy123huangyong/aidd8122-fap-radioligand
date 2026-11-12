@@ -45,6 +45,8 @@ src/
   32_desktop_deck_polish.py  aligns the deck text with its speaker notes
   33_report_polish.py    final terminology pass (four regressors + mean baseline)
   34_code_only_repo.py   points the report and deck at a code-only repository
+  35_report_layout_final.py  typography pass: cover block, TOC without rules or dot leaders,
+                         heading scale, 1.5 body spacing, isotope superscripts (--check/--audit)
   deck_notes.py          Chinese speaker-notes text + Q&A
   aidd_utils.py          featurisation, splits, metrics, plotting style
   pack_submission.py     assembles the submission package and its .zip
