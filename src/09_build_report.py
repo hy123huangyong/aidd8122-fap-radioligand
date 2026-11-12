@@ -1678,6 +1678,12 @@ def main() -> None:
         set_run(rr, size=12, bold=True)
     for row in range(len(tbl.rows)):
         if tbl.cell(row, 0).text.strip().startswith("Submission Date"):
+            # the submitted cover uses the short label "Date:"; step 23 also
+            # enforces this on already-built documents
+            for pp in tbl.cell(row, 0).paragraphs:
+                for lr in pp.runs:
+                    if "Submission Date" in lr.text:
+                        lr.text = lr.text.replace("Submission Date", "Date")
             cell = tbl.cell(row, 1)
             cell.text = ""
             rr = cell.paragraphs[0].add_run(DATE)

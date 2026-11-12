@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Assemble the submission package from the working tree.
 
-Builds ``Submission_HuangYong_P2600222/`` with the v2 report, the 15-minute
+Builds ``Submission_HuangYong_P2600222/`` with the v2 report, the 10-minute
 presentation and its notes, the numbered source code, the raw ChEMBL exports,
 the intermediate curated tables, the process evidence (logs, environment
 fingerprint, reproduction log, file manifest), every results table/figure
@@ -81,6 +81,15 @@ def copy_files() -> list[str]:
         shutil.copy2(py, src_dir / py.name)
         copied.append(f"03_Code/src/{py.name}")
 
+    # style assets needed by 24_restyle_mpu_deck.py (crest, wordmark, schematics)
+    asset_src = ROOT / "assets"
+    if asset_src.exists():
+        asset_dir = PKG / "assets"
+        asset_dir.mkdir(parents=True, exist_ok=True)
+        for f in sorted(asset_src.glob("*.png")):
+            shutil.copy2(f, asset_dir / f.name)
+            copied.append(f"assets/{f.name}")
+
     # P0.1 evidence bundle: logs + raw API exports + intermediate tables
     for sub, source, pattern in (
         ("03_Code/logs", ROOT / "logs", "*"),
@@ -120,16 +129,22 @@ def export_notes() -> None:
     if not deck.exists():
         return
     prs = Presentation(deck)
-    lines = ["# AIDD8122 汇报讲稿（10 分钟节奏）\n",
-             "Huang Yong · P2600222 · Group 2 · 24 November 2026\n",
-             "每页备注已同步写入 .pptx 的演讲者备注栏；本文件便于打印。\n"]
-    for i, slide in enumerate(prs.slides, 1):
-        text = ""
-        for shp in slide.notes_slide.shapes:
-            if shp.has_text_frame and shp.text_frame.text.strip():
-                text = shp.text_frame.text.strip()
-                break
+    pages = [(s.notes_slide.notes_text_frame.text.strip() if s.has_notes_slide else "")
+             for s in prs.slides]
+    total = sum(len(p) for p in pages)          # count follows the deck, not a constant
+    lines = ["# AIDD8122 汇报讲稿（大白话版）\n",
+             "Huang Yong · P2600222 · Group 2 · 16 November 2026\n",
+             "每页都是能直接照着念的白话，已经同步写进 .pptx 的演讲者备注栏；这份是打印用的。\n",
+             f"全篇约 {round(total, -2):.0f} 字，正常语速十分钟。时间紧就每页只念开头一两句和最后结论，\n",
+             "中间的数字解释留给自己看懂就行。开讲前先翻最后的「提问环节可能问到」。\n"]
+    for i, text in enumerate(pages, 1):
         lines.append(f"\n---\n\n## {i:02d}\n\n```\n{text}\n```\n")
+
+    # 白话 Q&A 只附在打印版，不塞进 8 秒的末页备注栏
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from deck_notes import QA
+    lines.append("\n---\n\n" + QA)
+
     out = PKG / "02_Presentation" / "Speaker_Notes_10min.md"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(lines), encoding="utf-8")

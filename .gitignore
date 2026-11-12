@@ -35,6 +35,7 @@ _chk/
 .workbuddy/
 GITHUB_AUTH_CODE.txt
 results/figures_bak/
+results/figures_bak_20261110/
 results/tables/_bak_*.csv
 
 # internal review drafts, superseded deck versions and one-off publishing helpers
@@ -48,3 +49,16 @@ AIDD8122_Final_Presentation_HuangYong/*_15min.pdf
 AIDD8122_Final_Presentation_HuangYong/slides/
 src/authorize_device.py
 src/publish_repo.py
+
+# ── source-only public release ─────────────────────────────────────────────
+# The public repository carries the scripts only. Curated data, derived results,
+# the report and the deck stay in the private working tree and the submission
+# package; the scripts regenerate them locally.
+/data/
+/results/
+/report/
+/assets/
+/docs/
+/logs/
+/AIDD8122_Final_Presentation_HuangYong/
+/repo_url.txt

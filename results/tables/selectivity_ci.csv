@@ -1,5 +1,0 @@
-split,protocol,delta_R2_mean,delta_R2_std,delta_R2_count,delta_Spearman_mean,delta_Spearman_std,delta_Spearman_count,delta_MAE_mean,delta_MAE_std,delta_MAE_count,selectivity_AUROC_mean,selectivity_AUROC_std,selectivity_AUROC_count,delta_R2_ci95,delta_Spearman_ci95,delta_MAE_ci95,selectivity_AUROC_ci95
-random,direct,0.268,0.199,20,0.581,0.127,20,0.8,0.142,20,0.818,0.082,20,0.087,0.056,0.062,0.036
-random,indirect,0.324,0.187,20,0.625,0.126,20,0.77,0.139,20,0.841,0.083,20,0.082,0.055,0.061,0.036
-scaffold,direct,-0.207,0.156,20,0.044,0.166,20,1.202,0.095,20,0.364,0.113,20,0.068,0.073,0.042,0.05
-scaffold,indirect,-0.175,0.233,20,0.102,0.2,20,1.181,0.117,20,0.378,0.124,20,0.102,0.088,0.051,0.054
