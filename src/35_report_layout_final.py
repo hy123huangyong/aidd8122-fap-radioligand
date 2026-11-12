@@ -219,6 +219,19 @@ def headings(doc) -> dict:
     return counts
 
 
+BREAK_BEFORE = "§1. Introduction"
+
+
+def page_breaks(doc) -> int:
+    """Abstract keeps its own page; the introduction opens the body on a new one."""
+    n = 0
+    for par in doc.paragraphs:
+        if par.text.strip() == BREAK_BEFORE and par.style.name == "Heading 1":
+            par.paragraph_format.page_break_before = True
+            n += 1
+    return n
+
+
 def toc_styles(doc) -> int:
     """Set the size on the TOC styles too, so a field update in Word keeps the
     hierarchy instead of falling back to Word's 11 pt for both levels."""
@@ -433,6 +446,9 @@ def verify(doc) -> None:
                      if t.get(qn("w:leader")) not in (None, "none")]
     assert not style_leaders, f"{len(style_leaders)} TOC style tab stops still carry a leader"
 
+    intro = next(p for p in doc.paragraphs if p.text.strip() == BREAK_BEFORE)
+    assert intro.paragraph_format.page_break_before, "introduction does not start a new page"
+
     for par in doc.paragraphs:
         if par.style.name in ("Heading 1", "Heading 2"):
             assert par.paragraph_format.keep_with_next, f"heading without keep-next: {par.text[:40]}"
@@ -507,6 +523,7 @@ def main() -> None:
     rule = strip_toc_rule(doc)
     lead = strip_leaders(doc)
     h = headings(doc)
+    brk = page_breaks(doc)
     b = body(doc)
     cap = captions(doc)
     paths = path_lists(doc)
@@ -517,6 +534,7 @@ def main() -> None:
           f"{c['spacer_lines']} spacer lines")
     print(f"  TOC             : {rule} underline runs removed, {lead} leaders -> plain tabs")
     print(f"  headings        : H1 {h['h1']} @ {H1[0]} pt, H2 {h['h2']} @ {H2[0]} pt, H3 {h['h3']}")
+    print(f"  page break      : {brk} before {BREAK_BEFORE!r}")
     print(f"  body            : {b['prose']} paragraphs @ 1.5 / no gap, {b['bullets']} bullets")
     print(f"  captions        : {cap} kept whole and with their float; {paths} path list left-aligned")
     print(f"  isotopes        : {iso} runs rewritten, "
@@ -530,6 +548,7 @@ def main() -> None:
     strip_toc_rule(doc2)
     typed = toc_type(doc2)
     styled = toc_styles(doc2)
+    page_breaks(doc2)
     kept = keep_headings_with_next(doc2)
     doc2.save(str(DOCX))
     print(f"  post-refresh    : {again} leaders stripped (paragraph + style), "
